@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iqbal Tok - Short Video Platform</title>
-    
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Roboto, sans-serif; }
         body { background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
 
         /* Top Header */
@@ -26,63 +22,54 @@
         /* Video Info Overlay */
         .video-info { position: absolute; bottom: 75px; left: 16px; right: 80px; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
         .username { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-        .caption { font-size: 14px; margin-bottom: 8px; opacity: 0.95; line-height: 1.3; }
+        .caption { font-size: 14px; margin-bottom: 8px; opacity: 0.95; }
         .music { font-size: 13px; opacity: 0.85; display: flex; align-items: center; gap: 6px; }
 
         /* Right Action Buttons */
         .action-sidebar { position: absolute; bottom: 85px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 18px; }
         .action-btn { background: rgba(0,0,0,0.3); width: 46px; height: 46px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; font-size: 11px; gap: 2px; border: none; color: #fff; }
-        .action-btn svg { width: 26px; height: 26px; fill: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+        .action-btn svg { width: 26px; height: 26px; fill: #fff; }
 
-        /* Camera / Shooting Screen Overlay */
-        #camera-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; }
-        .camera-top-bar { width: 100%; display: flex; justify-content: space-between; align-items: center; padding-top: 10px; z-index: 10; }
-        .close-camera { background: rgba(0,0,0,0.5); color: #fff; padding: 8px 16px; border-radius: 20px; cursor: pointer; font-weight: 500; font-size: 14px; }
-        
+        /* Camera Screen */
+        #camera-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; }
         #camera-preview { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; }
         
+        .camera-top { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 10; }
+        .cam-btn-top { background: rgba(0,0,0,0.5); color: #fff; padding: 10px 18px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+
         .camera-controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; }
         .shoot-btn { width: 76px; height: 76px; border-radius: 50%; background: transparent; border: 4px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .shoot-inner { width: 62px; height: 62px; border-radius: 50%; background: #ff3b5c; transition: all 0.2s; }
-        .shoot-btn.recording .shoot-inner { border-radius: 8px; width: 36px; height: 36px; background: #ff3b5c; }
-
-        /* Preview Recorded Video Screen */
-        #preview-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 110; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; }
-        #recorded-video { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; }
-        .preview-actions { position: absolute; bottom: 50px; width: 100%; display: flex; justify-content: space-around; z-index: 10; padding: 0 30px; }
-        .preview-btn { background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.3); padding: 12px 24px; border-radius: 25px; font-weight: 600; cursor: pointer; font-size: 15px; }
-        .preview-btn.primary { background: #ff3b5c; border: none; }
+        .shoot-inner { width: 60px; height: 60px; border-radius: 50%; background: #ff3b5c; transition: all 0.2s; }
+        .shoot-btn.recording .shoot-inner { border-radius: 8px; width: 36px; height: 36px; }
 
         /* Bottom Navigation Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; align-items: center; z-index: 50; border-top: 1px solid #222; }
         .nav-item { color: #777; font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
         .nav-item.active { color: #fff; }
         .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
-        .add-post-btn { background: #ff3b5c; width: 44px; height: 28px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 22px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 8px rgba(255,59,92,0.4); }
+        .add-post-btn { background: #ff3b5c; width: 44px; height: 28px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 22px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <!-- Top Header -->
     <div class="top-header">
         <span>Following</span>
         <span class="active">For You</span>
     </div>
 
-    <!-- Video Feed View -->
+    <!-- Video Feed -->
     <div id="feed-container">
-        <!-- Sample Video -->
         <div class="video-card">
             <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
             <div class="video-info">
                 <div class="username">@iqbal_official</div>
-                <div class="caption">Welcome to Iqbal Tok! Enjoy short videos. #iqbaltok #trending</div>
+                <div class="caption">Welcome to Iqbal Tok! Fast & smooth. #iqbaltok</div>
                 <div class="music">🎵 Original Sound - Iqbal Tok</div>
             </div>
             <div class="action-sidebar">
                 <button class="action-btn" onclick="likeVideo(this)">
                     <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    <span>125K</span>
+                    <span>99K</span>
                 </button>
                 <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
                     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -92,10 +79,11 @@
         </div>
     </div>
 
-    <!-- Camera Shooting Screen -->
+    <!-- Camera Screen -->
     <div id="camera-screen">
-        <div class="camera-top-bar">
-            <div class="close-camera" onclick="closeCamera()">✕ Cancel</div>
+        <div class="camera-top">
+            <button class="cam-btn-top" onclick="closeCamera()">✕ Cancel</button>
+            <button class="cam-btn-top" onclick="switchCamera()">🔄 Flip</button>
         </div>
         <video id="camera-preview" autoplay playsinline muted></video>
         <div class="camera-controls">
@@ -105,16 +93,7 @@
         </div>
     </div>
 
-    <!-- Video Preview Screen -->
-    <div id="preview-screen">
-        <video id="recorded-video" autoplay loop playsinline></video>
-        <div class="preview-actions">
-            <button class="preview-btn" onclick="retakeVideo()">Retake</button>
-            <button class="preview-btn primary" onclick="saveAndPostVideo()">Post / Save</button>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <div class="nav-item active">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -139,14 +118,10 @@
         let mediaStream = null;
         let mediaRecorder = null;
         let recordedChunks = [];
-        let recordedBlobUrl = null;
+        let useFrontCamera = true;
 
-        function togglePlay(videoElement) {
-            if (videoElement.paused) {
-                videoElement.play();
-            } else {
-                videoElement.pause();
-            }
+        function togglePlay(video) {
+            video.paused ? video.play() : video.pause();
         }
 
         function downloadVideo(url) {
@@ -167,13 +142,29 @@
 
         async function openCamera() {
             document.getElementById('camera-screen').style.display = 'flex';
+            startStream();
+        }
+
+        async function startStream() {
+            if (mediaStream) {
+                mediaStream.getTracks().forEach(track => track.stop());
+            }
             try {
-                mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+                const constraints = {
+                    video: { facingMode: useFrontCamera ? 'user' : 'environment' },
+                    audio: true
+                };
+                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('camera-preview').srcObject = mediaStream;
             } catch (err) {
-                alert('Camera access denied or not supported.');
+                alert('Camera error or permission denied.');
                 closeCamera();
             }
+        }
+
+        function switchCamera() {
+            useFrontCamera = !useFrontCamera;
+            startStream();
         }
 
         function closeCamera() {
@@ -194,21 +185,16 @@
                     mediaRecorder = new MediaRecorder(mediaStream);
                 }
 
-                mediaRecorder.ondataavailable = function(event) {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
+                mediaRecorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) recordedChunks.push(e.data);
                 };
 
-                mediaRecorder.onstop = function() {
+                mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    recordedBlobUrl = URL.createObjectURL(blob);
-                    
-                    // Show Preview Screen instead of direct download
-                    document.getElementById('camera-screen').style.display = 'none';
-                    const previewVideo = document.getElementById('recorded-video');
-                    previewVideo.src = recordedBlobUrl;
-                    document.getElementById('preview-screen').style.display = 'flex';
+                    const url = URL.createObjectURL(blob);
+                    downloadVideo(url);
+                    alert('Video recorded & downloaded directly!');
+                    closeCamera();
                 };
 
                 mediaRecorder.start();
@@ -216,40 +202,8 @@
             } else {
                 mediaRecorder.stop();
                 shootBtn.classList.remove('recording');
-                if (mediaStream) {
-                    mediaStream.getTracks().forEach(track => track.stop());
-                }
             }
         }
-
-        function retakeVideo() {
-            document.getElementById('preview-screen').style.display = 'none';
-            openCamera();
-        }
-
-        function saveAndPostVideo() {
-            downloadVideo(recordedBlobUrl);
-            alert('Video saved successfully!');
-            document.getElementById('preview-screen').style.display = 'none';
-        }
-
-        // Autoplay visible video during scroll
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                let video = entry.target.querySelector('video');
-                if (video) {
-                    if (entry.isIntersecting) {
-                        video.play().catch(() => {});
-                    } else {
-                        video.pause();
-                    }
-                }
-            });
-        }, { threshold: 0.6 });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
-        });
     </script>
 </body>
 </html>
