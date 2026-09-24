@@ -18,7 +18,7 @@
         .top-header span { opacity: 0.7; cursor: pointer; }
         .top-header span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 2px; }
 
-        /* Video Feed Container (TikTok Style) */
+        /* Video Feed Container */
         #feed-container { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; background: #111; }
         .video-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; background: #000; }
         .video-card video { width: 100%; height: 100%; object-fit: cover; }
@@ -29,7 +29,7 @@
         .caption { font-size: 14px; margin-bottom: 8px; opacity: 0.9; }
         .music { font-size: 13px; opacity: 0.8; display: flex; align-items: center; gap: 6px; }
 
-        /* Right Action Buttons (Like, Download, Share) */
+        /* Right Action Buttons */
         .action-sidebar { position: absolute; bottom: 80px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 20px; }
         .action-btn { background: rgba(0,0,0,0.4); width: 48px; height: 48px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; font-size: 12px; gap: 2px; border: none; color: #fff; }
         .action-btn svg { width: 24px; height: 24px; fill: #fff; }
@@ -38,7 +38,8 @@
         #camera-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; padding: 20px; }
         #camera-preview { width: 100%; height: 75vh; object-fit: cover; border-radius: 16px; background: #222; }
         .camera-controls { display: flex; gap: 30px; align-items: center; margin-bottom: 20px; }
-        .shoot-btn { width: 75px; height: 75px; border-radius: 50%; background: #ff3b5c; border: 4px solid #fff; cursor: pointer; }
+        .shoot-btn { width: 75px; height: 75px; border-radius: 50%; background: #ff3b5c; border: 4px solid #fff; cursor: pointer; transition: transform 0.2s; }
+        .shoot-btn.recording { background: #fff; transform: scale(0.9); }
         .close-camera { background: rgba(255,255,255,0.2); padding: 10px 20px; border-radius: 20px; cursor: pointer; font-weight: 500; }
 
         /* Bottom Navigation Bar */
@@ -69,7 +70,7 @@
         </div>
         <video id="camera-preview" autoplay playsinline muted></video>
         <div class="camera-controls">
-            <button class="shoot-btn" onclick="toggleRecording()"></button>
+            <button class="shoot-btn" id="shootBtn" onclick="toggleRecording()"></button>
         </div>
     </div>
 
@@ -109,8 +110,10 @@
         const db = firebase.database();
 
         let mediaStream = null;
+        let mediaRecorder = null;
+        let recordedChunks = [];
 
-        // Load Videos from Firebase Database
+        // Load Videos from Firebase Database (with default sample if empty)
         function loadVideos() {
             db.ref('videos').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -143,7 +146,27 @@
                     feedContainer.innerHTML = html;
                     setupAutoplay();
                 } else {
-                    feedContainer.innerHTML = `<div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">No videos found in database. Add some!</div>`;
+                    // Sample video if database has no items yet
+                    feedContainer.innerHTML = `
+                        <div class="video-card">
+                            <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
+                            <div class="video-info">
+                                <div class="username">@iqbal_official</div>
+                                <div class="caption">Welcome to Iqbal Tok! First sample video. #iqbaltok</div>
+                                <div class="music">🎵 Original Sound - Iqbal Tok</div>
+                            </div>
+                            <div class="action-sidebar">
+                                <button class="action-btn" onclick="likeVideo(this)">
+                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                    <span>50K</span>
+                                </button>
+                                <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
+                                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                    <span>Save</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 }
             });
         }
@@ -192,8 +215,40 @@
             }
         }
 
+        // Real Video Recording Logic
         function toggleRecording() {
-            alert('Video recording started! (Feature ready for cloud upload extension)');
+            const shootBtn = document.getElementById('shootBtn');
+            
+            if (!mediaRecorder || mediaRecorder.state === "inactive") {
+                recordedChunks = [];
+                try {
+                    mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
+                } catch (e) {
+                    mediaRecorder = new MediaRecorder(mediaStream);
+                }
+
+                mediaRecorder.ondataavailable = function(event) {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = function() {
+                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                    const videoURL = URL.createObjectURL(blob);
+                    
+                    // Automatically download the recorded video to phone
+                    downloadVideo(videoURL);
+                    alert('Video recorded and downloaded successfully!');
+                    closeCamera();
+                };
+
+                mediaRecorder.start();
+                shootBtn.classList.add('recording');
+            } else {
+                mediaRecorder.stop();
+                shootBtn.classList.remove('recording');
+            }
         }
 
         // Autoplay visible video during scroll
