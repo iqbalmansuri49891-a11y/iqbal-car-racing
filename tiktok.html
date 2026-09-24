@@ -35,7 +35,7 @@
         #camera-preview { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; }
         
         .camera-top { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 10; }
-        .cam-btn-top { background: rgba(0,0,0,0.5); color: #fff; padding: 10px 18px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
+        .cam-btn-top { background: rgba(0,0,0,0.6); color: #fff; padding: 10px 18px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
 
         .camera-controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; }
         .shoot-btn { width: 76px; height: 76px; border-radius: 50%; background: transparent; border: 4px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; }
@@ -63,13 +63,13 @@
             <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
             <div class="video-info">
                 <div class="username">@iqbal_official</div>
-                <div class="caption">Welcome to Iqbal Tok! Fast & smooth. #iqbaltok</div>
+                <div class="caption">Welcome to Iqbal Tok! Perfect & smooth. #iqbaltok</div>
                 <div class="music">🎵 Original Sound - Iqbal Tok</div>
             </div>
             <div class="action-sidebar">
                 <button class="action-btn" onclick="likeVideo(this)">
                     <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    <span>99K</span>
+                    <span>100K</span>
                 </button>
                 <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
                     <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -157,7 +157,7 @@
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('camera-preview').srcObject = mediaStream;
             } catch (err) {
-                alert('Camera error or permission denied.');
+                alert('Camera permission required.');
                 closeCamera();
             }
         }
@@ -193,7 +193,6 @@
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
                     const url = URL.createObjectURL(blob);
                     downloadVideo(url);
-                    alert('Video recorded & downloaded directly!');
                     closeCamera();
                 };
 
