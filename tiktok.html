@@ -63,7 +63,7 @@
 
     <!-- Video Feed -->
     <div id="feed-container">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading videos...</div>
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading global feed...</div>
     </div>
 
     <!-- Camera Screen -->
@@ -90,7 +90,7 @@
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             Discover
         </div>
-        <div class="add-post-btn" onclick="openCamera()">+</div>
+        <div class="add-post-btn" onclick="openUploadOptions()">+</div>
         <div class="nav-item">
             <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
             Inbox
@@ -101,8 +101,8 @@
         </div>
     </div>
 
-    <!-- Hidden file input for direct video upload -->
-    <input type="file" id="videoUploadInput" accept="video/*" style="display: none;" onchange="handleVideoUpload(event)">
+    <!-- Hidden file input for public video upload -->
+    <input type="file" id="publicVideoInput" accept="video/*" style="display: none;" onchange="handlePublicUpload(event)">
 
     <script>
         const firebaseConfig = {
@@ -123,8 +123,8 @@
         let recordedChunks = [];
         let useFrontCamera = true;
 
-        // Load Videos from Database
-        function loadVideos() {
+        // Load Global Videos from Firebase
+        function loadGlobalFeed() {
             db.ref('videos').on('value', (snapshot) => {
                 const data = snapshot.val();
                 const feedContainer = document.getElementById('feed-container');
@@ -136,14 +136,14 @@
                             <div class="video-card">
                                 <video src="${v.videoUrl}" loop playsinline onclick="togglePlay(this)"></video>
                                 <div class="video-info">
-                                    <div class="username">@${v.username || 'iqbal_user'}</div>
-                                    <div class="caption">${v.caption || 'New video! #iqbaltok'}</div>
+                                    <div class="username">@${v.username || 'iqbal_creator'}</div>
+                                    <div class="caption">${v.caption || 'Awesome video! #iqbaltok'}</div>
                                     <div class="music">🎵 Original Sound - Iqbal Tok</div>
                                 </div>
                                 <div class="action-sidebar">
                                     <button class="action-btn" onclick="likeVideo(this)">
                                         <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                        <span>${v.likes || '10K'}</span>
+                                        <span>${v.likes || '15K'}</span>
                                     </button>
                                     <button class="action-btn" onclick="downloadVideo('${v.videoUrl}')">
                                         <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
@@ -200,15 +200,13 @@
             if(svg) svg.style.fill = '#ff3b5c';
         }
 
-        // Camera Open or Prompt Gallery Upload if user prefers
-        function openCamera() {
-            // Option to choose between Live Camera or Gallery Upload
-            let choice = confirm("Click 'OK' to Record from Camera, or 'Cancel' to Upload from Gallery!");
+        function openUploadOptions() {
+            let choice = confirm("OK = Record from Camera | Cancel = Upload from Gallery");
             if (choice) {
                 document.getElementById('camera-screen').style.display = 'flex';
                 startStream();
             } else {
-                document.getElementById('videoUploadInput').click();
+                document.getElementById('publicVideoInput').click();
             }
         }
 
@@ -224,7 +222,7 @@
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('camera-preview').srcObject = mediaStream;
             } catch (err) {
-                alert('Camera access error.');
+                alert('Camera permission required.');
                 closeCamera();
             }
         }
@@ -258,10 +256,11 @@
 
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const url = URL.createObjectURL(blob);
-                    
-                    // Save to Database Feed automatically
-                    uploadVideoToDatabase(url, "My recorded video #iqbaltok");
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blob);
+                    reader.onloadend = function() {
+                        pushToFirebase(reader.result, "My recorded video #iqbaltok");
+                    };
                     closeCamera();
                 };
 
@@ -273,28 +272,29 @@
             }
         }
 
-        // Handle Gallery Video Upload
-        function handleVideoUpload(event) {
+        function handlePublicUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                const url = URL.createObjectURL(file);
-                uploadVideoToDatabase(url, "Uploaded from gallery #iqbaltok");
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onloadend = function() {
+                    pushToFirebase(reader.result, "Public uploaded video #iqbaltok");
+                };
             }
         }
 
-        // Push new video to Firebase Database
-        function uploadVideoToDatabase(videoUrl, captionText) {
-            const newVideoRef = db.ref('videos').push();
-            newVideoRef.set({
+        function pushToFirebase(videoUrl, captionText) {
+            const newRef = db.ref('videos').push();
+            newRef.set({
                 videoUrl: videoUrl,
-                username: "iqbal_creator",
+                username: "public_creator",
                 caption: captionText,
-                likes: Math.floor(Math.random() * 5000) + 100
+                likes: Math.floor(Math.random() * 8000) + 500
             }, (error) => {
                 if (error) {
-                    alert('Upload failed!');
+                    alert('Upload failed. Try a smaller video.');
                 } else {
-                    alert('Video posted successfully to Iqbal Tok feed!');
+                    alert('Video uploaded successfully for everyone!');
                 }
             });
         }
@@ -316,7 +316,7 @@
             document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
         }
 
-        window.onload = loadVideos;
+        window.onload = loadGlobalFeed;
     </script>
 </body>
 </html>
