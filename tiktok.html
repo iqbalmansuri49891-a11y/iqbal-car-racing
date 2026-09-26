@@ -5,6 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iqbal Tok - Short Video Platform</title>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: Roboto, sans-serif; }
         body { background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
@@ -59,24 +63,7 @@
 
     <!-- Video Feed -->
     <div id="feed-container">
-        <div class="video-card">
-            <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
-            <div class="video-info">
-                <div class="username">@iqbal_official</div>
-                <div class="caption">Welcome to Iqbal Tok! Perfect & smooth. #iqbaltok</div>
-                <div class="music">🎵 Original Sound - Iqbal Tok</div>
-            </div>
-            <div class="action-sidebar">
-                <button class="action-btn" onclick="likeVideo(this)">
-                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    <span>100K</span>
-                </button>
-                <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
-                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    <span>Save</span>
-                </button>
-            </div>
-        </div>
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading videos...</div>
     </div>
 
     <!-- Camera Screen -->
@@ -114,11 +101,84 @@
         </div>
     </div>
 
+    <!-- Hidden file input for direct video upload -->
+    <input type="file" id="videoUploadInput" accept="video/*" style="display: none;" onchange="handleVideoUpload(event)">
+
     <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "iqbal-app-store.firebaseapp.com",
+            databaseURL: "https://iqbal-app-store-default-rtdb.firebaseio.com",
+            projectId: "iqbal-app-store",
+            storageBucket: "iqbal-app-store.appspot.com",
+            messagingSenderId: "123786659122",
+            appId: "1:123786659122:web:df6d6ab40065f77882fab"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
         let mediaStream = null;
         let mediaRecorder = null;
         let recordedChunks = [];
         let useFrontCamera = true;
+
+        // Load Videos from Database
+        function loadVideos() {
+            db.ref('videos').on('value', (snapshot) => {
+                const data = snapshot.val();
+                const feedContainer = document.getElementById('feed-container');
+                if (data) {
+                    let videos = Object.keys(data).map(key => data[key]).reverse();
+                    let html = '';
+                    videos.forEach(v => {
+                        html += `
+                            <div class="video-card">
+                                <video src="${v.videoUrl}" loop playsinline onclick="togglePlay(this)"></video>
+                                <div class="video-info">
+                                    <div class="username">@${v.username || 'iqbal_user'}</div>
+                                    <div class="caption">${v.caption || 'New video! #iqbaltok'}</div>
+                                    <div class="music">🎵 Original Sound - Iqbal Tok</div>
+                                </div>
+                                <div class="action-sidebar">
+                                    <button class="action-btn" onclick="likeVideo(this)">
+                                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                        <span>${v.likes || '10K'}</span>
+                                    </button>
+                                    <button class="action-btn" onclick="downloadVideo('${v.videoUrl}')">
+                                        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                        <span>Save</span>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    feedContainer.innerHTML = html;
+                    setupAutoplay();
+                } else {
+                    feedContainer.innerHTML = `
+                        <div class="video-card">
+                            <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
+                            <div class="video-info">
+                                <div class="username">@iqbal_official</div>
+                                <div class="caption">Welcome to Iqbal Tok! #iqbaltok</div>
+                                <div class="music">🎵 Original Sound - Iqbal Tok</div>
+                            </div>
+                            <div class="action-sidebar">
+                                <button class="action-btn" onclick="likeVideo(this)">
+                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                    <span>50K</span>
+                                </button>
+                                <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
+                                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                                    <span>Save</span>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+        }
 
         function togglePlay(video) {
             video.paused ? video.play() : video.pause();
@@ -140,9 +200,16 @@
             if(svg) svg.style.fill = '#ff3b5c';
         }
 
-        async function openCamera() {
-            document.getElementById('camera-screen').style.display = 'flex';
-            startStream();
+        // Camera Open or Prompt Gallery Upload if user prefers
+        function openCamera() {
+            // Option to choose between Live Camera or Gallery Upload
+            let choice = confirm("Click 'OK' to Record from Camera, or 'Cancel' to Upload from Gallery!");
+            if (choice) {
+                document.getElementById('camera-screen').style.display = 'flex';
+                startStream();
+            } else {
+                document.getElementById('videoUploadInput').click();
+            }
         }
 
         async function startStream() {
@@ -157,7 +224,7 @@
                 mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
                 document.getElementById('camera-preview').srcObject = mediaStream;
             } catch (err) {
-                alert('Camera permission required.');
+                alert('Camera access error.');
                 closeCamera();
             }
         }
@@ -192,7 +259,9 @@
                 mediaRecorder.onstop = () => {
                     const blob = new Blob(recordedChunks, { type: 'video/webm' });
                     const url = URL.createObjectURL(blob);
-                    downloadVideo(url);
+                    
+                    // Save to Database Feed automatically
+                    uploadVideoToDatabase(url, "My recorded video #iqbaltok");
                     closeCamera();
                 };
 
@@ -203,6 +272,51 @@
                 shootBtn.classList.remove('recording');
             }
         }
+
+        // Handle Gallery Video Upload
+        function handleVideoUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const url = URL.createObjectURL(file);
+                uploadVideoToDatabase(url, "Uploaded from gallery #iqbaltok");
+            }
+        }
+
+        // Push new video to Firebase Database
+        function uploadVideoToDatabase(videoUrl, captionText) {
+            const newVideoRef = db.ref('videos').push();
+            newVideoRef.set({
+                videoUrl: videoUrl,
+                username: "iqbal_creator",
+                caption: captionText,
+                likes: Math.floor(Math.random() * 5000) + 100
+            }, (error) => {
+                if (error) {
+                    alert('Upload failed!');
+                } else {
+                    alert('Video posted successfully to Iqbal Tok feed!');
+                }
+            });
+        }
+
+        function setupAutoplay() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    let video = entry.target.querySelector('video');
+                    if (video) {
+                        if (entry.isIntersecting) {
+                            video.play().catch(() => {});
+                        } else {
+                            video.pause();
+                        }
+                    }
+                });
+            }, { threshold: 0.6 });
+
+            document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
+        }
+
+        window.onload = loadVideos;
     </script>
 </body>
 </html>
