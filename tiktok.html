@@ -12,7 +12,6 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,system-ui,sans-serif;overflow:hidden}.app{width:100%;max-width:520px;height:100dvh;margin:auto;position:relative;background:#000}.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}.feed::-webkit-scrollbar{display:none}.video-card{height:100dvh;min-height:560px;position:relative;scroll-snap-align:start;background:#111;overflow:hidden}.video-card video{width:100%;height:100%;object-fit:cover;background:#111}.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 25%,transparent 48%,rgba(0,0,0,.86) 100%);pointer-events:none}.top{position:absolute;top:0;left:0;right:0;padding:15px 16px;padding-top:max(15px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;z-index:5}.logo{font-size:20px;font-weight:900;letter-spacing:-.4px}.logo i{font-style:normal;color:#ff315b}.tabs{display:flex;gap:17px;font-size:14px}.tabs span{opacity:.6}.tabs .active{opacity:1;font-weight:800}.info{position:absolute;left:16px;right:88px;bottom:86px;z-index:5}.user{font-size:17px;font-weight:800;margin-bottom:7px}.caption{font-size:15px;line-height:1.4;text-shadow:0 1px 3px #000}.music{margin-top:9px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{position:absolute;right:10px;bottom:86px;display:flex;flex-direction:column;align-items:center;gap:15px;z-index:6}.action{width:52px;border:0;background:none;color:#fff;font-size:28px;cursor:pointer;text-shadow:0 1px 5px #000}.action small{display:block;font-size:10px;margin-top:2px;font-weight:700}.liked{color:#ff315b}.avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#ff315b,#7c3cff);display:flex;align-items:center;justify-content:center;font-size:22px}.playhint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:48px;opacity:0;transition:.2s}.paused .playhint{opacity:.75}
 
-/* Floating Heart Animation on Double Tap */
 .floating-heart{position:absolute;font-size:75px;color:#ff315b;transform:translate(-50%,-50%) scale(0);animation:heartPop .6s ease-out forwards;pointer-events:none;z-index:20;}
 @keyframes heartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
 
@@ -31,7 +30,7 @@
 <script>
 const firebaseConfig={apiKey:"AIzaSy...",authDomain:"iqbal-app-store.firebaseapp.com",databaseURL:"https://iqbal-app-store-default-rtdb.firebaseio.com",projectId:"iqbal-app-store",storageBucket:"iqbal-app-store.appspot.com",messagingSenderId:"123786659122",appId:"1:123786659122:web:df6d6ab40065f77882fab"};
 let db=null,storage=null,selectedFile=null,allVideos=[];
-try{firebase.initializeApp(firebaseConfig);db=firebase.database();storage=firebase.storage();}catch(e){showToast('Firebase configuration needs to be completed.');}
+try{firebase.initializeApp(firebaseConfig);db=firebase.database();storage=firebase.storage();}catch(e){showToast('Firebase configuration error.');}
 const feed=document.getElementById('feed'),modal=document.getElementById('modal'),preview=document.getElementById('preview');
 function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>x.classList.remove('show'),2600)}
 const showToast=toast;
@@ -46,12 +45,10 @@ function setupCard(card){
   
   sound.onclick=e=>{e.stopPropagation();video.muted=!video.muted;sound.firstChild.textContent=video.muted?'🔇':'🔊';if(!video.muted)video.play().catch(()=>{})};
   
-  // Double Tap to Like Effect
   let lastTap=0;
   video.onclick=e=>{
     const now=Date.now();
     if(now-lastTap<300){
-      // Double Tap Triggered!
       const heart=document.createElement('div');
       heart.className='floating-heart';
       heart.innerHTML='❤️';
@@ -62,7 +59,6 @@ function setupCard(card){
       setTimeout(()=>heart.remove(),600);
       if(!like.classList.contains('liked')){like.classList.add('liked');like.firstChild.textContent='♥';}
     }else{
-      // Single Tap Play/Pause
       setTimeout(()=>{
         if(Date.now()-lastTap>=300){
           if(video.paused){video.play().catch(()=>{});card.classList.remove('paused')}else{video.pause();card.classList.add('paused')}
@@ -85,7 +81,58 @@ function openUpload(){modal.style.display='flex'}
 function closeUpload(){modal.style.display='none';document.getElementById('form').style.display='none';selectedFile=null;preview.removeAttribute('src');preview.load();document.getElementById('cameraFile').value='';document.getElementById('galleryFile').value='';document.getElementById('status').textContent='';document.getElementById('progress').style.display='none'}
 function handleFile(e){const f=e.target.files[0];if(!f)return;if(!f.type.startsWith('video/'))return showToast('Please select a video file.');if(f.size>100*1024*1024)return showToast('Video must be 100 MB or smaller.');selectedFile=f;preview.src=URL.createObjectURL(f);document.getElementById('form').style.display='block';document.getElementById('status').textContent=`${(f.size/1024/1024).toFixed(1)} MB selected`}
 document.getElementById('cameraFile').onchange=handleFile;document.getElementById('galleryFile').onchange=handleFile;
-async function publishVideo(){if(!selectedFile)return showToast('Choose a video first.');if(!db||!storage)return showToast('Firebase is not configured correctly.');const btn=document.getElementById('publishBtn');btn.disabled=true;btn.textContent='Publishing…';const user=(document.getElementById('username').value.trim()||'@iqbaluser').replace(/\s+/g,'');const caption=document.getElementById('caption').value.trim()||'My new video 🎬';const id=db.ref('videos').push().key;const path=`videos/${id}_${Date.now()}.${(selectedFile.name.spec||selectedFile.name.split('.').pop()||'mp4').replace(/[^a-z0-9]/gi,'')}`;try{const task=storage.ref(path).put(selectedFile,{contentType:selectedFile.type});document.getElementById('progress').style.display='block';task.on('state_changed',s=>{document.getElementById('progressBar').style.width=((s.bytesTransferred/s.totalBytes)*100)+'%'},()=>{},async()=>{const url=await task.snapshot.ref.getDownloadURL();await db.ref('videos/'+id).set({videoUrl:url,username:user,caption,likes:Math.floor(Math.random()*50)+1,createdAt:firebase.database.ServerValue.TIMESTAMP});showToast('Video published successfully!');closeUpload()})}catch(e){console.error(e);showToast('Publish failed. Check Firebase Storage rules.')}finally{setTimeout(()=>{btn.disabled=false;btn.textContent='Publish Video'},800)}}
+
+async function publishVideo(){
+  if(!selectedFile)return showToast('Choose a video first.');
+  if(!db||!storage)return showToast('Firebase is not configured correctly.');
+  
+  const btn=document.getElementById('publishBtn');
+  btn.disabled=true;
+  btn.textContent='Publishing…';
+  
+  const user=(document.getElementById('username').value.trim()||'@iqbaluser').replace(/\s+/g,'');
+  const caption=document.getElementById('caption').value.trim()||'My new video 🎬';
+  const id=db.ref('videos').push().key;
+  
+  const cleanName=(selectedFile.name||'video.mp4').replace(/[^a-z0-9.]/gi,'');
+  const path=`videos/${id}_${Date.now()}_${cleanName}`;
+  
+  try{
+    const storageRef=storage.ref(path);
+    const task=storageRef.put(selectedFile,{contentType:selectedFile.type});
+    document.getElementById('progress').style.display='block';
+    
+    task.on('state_changed',s=>{
+      let pct=(s.bytesTransferred/s.totalBytes)*100;
+      document.getElementById('progressBar').style.width=pct+'%';
+      document.getElementById('status').textContent=`Uploading: ${Math.round(pct)}%`;
+    },err=>{
+      console.error(err);
+      showToast('Upload error! Check Firebase Storage rules.');
+      btn.disabled=false;
+      btn.textContent='Publish Video';
+    },async()=>{
+      const url=await task.snapshot.ref.getDownloadURL();
+      await db.ref('videos/'+id).set({
+        videoUrl:url,
+        username:user,
+        caption:caption,
+        likes:Math.floor(Math.random()*50)+1,
+        createdAt:firebase.database.ServerValue.TIMESTAMP
+      });
+      showToast('Video published successfully!');
+      closeUpload();
+      btn.disabled=false;
+      btn.textContent='Publish Video';
+    });
+  }catch(e){
+    console.error(e);
+    showToast('Publish failed. Check Firebase Storage rules.');
+    btn.disabled=false;
+    btn.textContent='Publish Video';
+  }
+}
+
 function openPage(id){document.getElementById(id).style.display='block'}function closePage(id){document.getElementById(id).style.display='none'}function home(){['profile','searchPage','inboxPage'].forEach(id=>document.getElementById(id).style.display='none');feed.scrollTo({top:0,behavior:'smooth'})}
 document.getElementById('searchInput').oninput=e=>{const q=e.target.value.toLowerCase().trim();const r=document.getElementById('searchResults');if(!q){r.innerHTML='';return}const hits=allVideos.filter(v=>(v.username||'').toLowerCase().includes(q)||(v.caption||'').toLowerCase().includes(q));r.innerHTML=hits.length?hits.map(v=>`<div style="padding:12px 0;border-bottom:1px solid #eee"><b>${escapeHTML(v.username||'@iqbaluser')}</b><div class="muted">${escapeHTML(v.caption||'')}</div></div>`).join(''):'<div class="empty">No videos found.</div>'};
 window.onload=loadGlobalFeed;
