@@ -3,39 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iqbal TikTok</title>
+    <title>TikTok</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background: #000; color: #fff; height: 100vh; overflow: hidden; display: flex; justify-content: center; align-items: center; }
         .app-container { width: 100%; max-width: 420px; height: 100vh; background: #000; position: relative; display: flex; flex-direction: column; }
         
-        /* Top Tabs Header */
-        .top-header { position: absolute; top: 10px; left: 0; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 10; font-size: 16px; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-        .top-header span { opacity: 0.6; cursor: pointer; }
-        .top-header span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 3px; }
+        /* Top Tabs */
+        .top-tabs { position: absolute; top: 12px; left: 0; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 10; font-size: 16px; font-weight: bold; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        .top-tabs span { opacity: 0.6; cursor: pointer; }
+        .top-tabs span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 3px; }
 
-        /* Feed Container */
-        .feed-container { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; position: relative; width: 100%; height: 100vh; }
+        /* Feed */
+        .feed-container { flex: 1; overflow-y: scroll; scroll-snap-type: y mandatory; position: relative; width: 100%; height: 100vh; scrollbar-width: none; }
+        .feed-container::-webkit-scrollbar { display: none; }
         .video-card { width: 100%; height: 100vh; scroll-snap-align: start; position: relative; background: #111; display: flex; justify-content: center; align-items: center; }
         .video-card video, .video-card img { width: 100%; height: 100%; object-fit: cover; }
         
-        /* Video Overlay Info */
-        .overlay { position: absolute; bottom: 70px; left: 15px; right: 70px; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
+        /* Overlay Info */
+        .overlay { position: absolute; bottom: 70px; left: 15px; right: 75px; z-index: 5; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
         .overlay h3 { margin-bottom: 5px; font-size: 16px; font-weight: bold; }
-        .overlay p { font-size: 14px; opacity: 0.9; margin-bottom: 5px; }
+        .overlay p { font-size: 14px; opacity: 0.95; margin-bottom: 5px; }
+        .music-info { font-size: 12px; opacity: 0.8; }
 
-        /* Right Side Action Buttons (Like/Comment) */
-        .side-actions { position: absolute; right: 15px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 5; }
-        .action-btn { background: rgba(0,0,0,0.3); border: none; color: #fff; width: 45px; height: 45px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; }
-        .action-btn span { font-size: 11px; margin-top: 2px; }
+        /* Right Actions */
+        .side-actions { position: absolute; right: 12px; bottom: 80px; display: flex; flex-direction: column; align-items: center; gap: 15px; z-index: 5; }
+        .action-btn { background: rgba(0,0,0,0.3); border: none; color: #fff; width: 45px; height: 45px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .action-btn span { font-size: 11px; margin-top: 2px; font-weight: 600; }
 
-        /* Bottom TikTok Navigation Bar */
+        /* Bottom Nav Bar */
         .nav-bar { position: absolute; bottom: 0; left: 0; width: 100%; height: 55px; background: #000; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #222; z-index: 100; }
         .nav-item { color: #888; font-size: 11px; cursor: pointer; background: none; border: none; display: flex; flex-direction: column; align-items: center; gap: 3px; }
         .nav-item.active { color: #fff; }
-        .upload-nav-btn { background: #fe2c55; color: #fff; width: 42px; height: 28px; border-radius: 8px; font-size: 20px; font-weight: bold; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 0 10px rgba(254,44,85,0.5); }
+        .upload-btn-nav { background: #fe2c55; color: #fff; width: 42px; height: 28px; border-radius: 8px; font-size: 20px; font-weight: bold; border: none; display: flex; justify-content: center; align-items: center; cursor: pointer; }
 
-        /* Upload Modal Popup */
+        /* Upload Modal */
         .upload-modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 200; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 20px; }
         .upload-modal h2 { margin-bottom: 20px; color: #fe2c55; }
         .upload-modal input, .upload-modal button { width: 100%; max-width: 300px; padding: 14px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
@@ -46,25 +48,25 @@
 <body>
 
 <div class="app-container">
-    <!-- Top Header Tabs -->
-    <div class="top-header">
+    <!-- Top Tabs -->
+    <div class="top-tabs">
         <span>Following</span>
         <span class="active">For You</span>
     </div>
 
-    <!-- Main Feed -->
+    <!-- Feed -->
     <div class="feed-container" id="feedContainer">
-        <!-- Default Sample Video (Jaise pehle tha) -->
         <div class="video-card">
             <video src="https://res.cloudinary.com/uy00rl24/video/upload/v1/samples/elephants.mp4" autoplay loop muted playsinline></video>
             <div class="overlay">
                 <h3>@iqbal_official</h3>
-                <p>Welcome to Iqbal TikTok! First sample video[span_3](start_span)[span_3](end_span).</p>
-                <p style="font-size:12px; color:#ccc;">#iqbaltiktok #trending</p>
+                <p>Welcome to Iqbal Tok! First sample video.</p>
+                <div class="music-info">🎵 Original Sound - Iqbal Tok</div>
             </div>
             <div class="side-actions">
                 <button class="action-btn" onclick="this.style.color='red'">❤️<span>50K</span></button>
                 <button class="action-btn">💬<span>1200</span></button>
+                <button class="action-btn" onclick="window.open('https://res.cloudinary.com/uy00rl24/video/upload/v1/samples/elephants.mp4')">📥<span>Save</span></button>
                 <button class="action-btn">↗️<span>Share</span></button>
             </div>
         </div>
@@ -72,27 +74,26 @@
 
     <!-- Upload Modal -->
     <div class="upload-modal" id="uploadModal">
-        <h2>Upload to TikTok</h2>
-        <input type="text" id="captionInput" placeholder="Enter video caption & hashtags...">
+        <h2>Upload Video</h2>
+        <input type="text" id="captionInput" placeholder="Enter caption...">
         <input type="file" id="fileInput" accept="video/*,image/*">
-        <button class="submit-btn" onclick="uploadMedia()">Post Video</button>
+        <button class="submit-btn" onclick="uploadMedia()">Post</button>
         <button onclick="toggleUploadModal()" style="background:#444; color:#fff;">Cancel</button>
     </div>
 
-    <!-- Bottom Navigation Bar -->
+    <!-- Bottom Nav -->
     <div class="nav-bar">
         <button class="nav-item active" onclick="window.scrollTo(0,0)">🏠<span>Home</span></button>
-        <button class="nav-item" onclick="alert('Discover feature coming soon!')">🔍<span>Discover</span></button>
-        <button class="upload-nav-btn" onclick="toggleUploadModal()">+</button>
-        <button class="nav-item" onclick="alert('Inbox is empty!')">💬<span>Inbox</span></button>
-        <button class="nav-item" onclick="alert('Profile page!')">👤<span>Me</span></button>
+        <button class="nav-item" onclick="alert('Discover')">🔍<span>Discover</span></button>
+        <button class="upload-btn-nav" onclick="toggleUploadModal()">+</button>
+        <button class="nav-item" onclick="alert('Inbox')">💬<span>Inbox</span></button>
+        <button class="nav-item" onclick="alert('Profile')">👤<span>Me</span></button>
     </div>
 </div>
 
 <script>
-    // Cloudinary Credentials Set
-    const CLOUD_NAME = "uy00rl24";[span_4](start_span)[span_4](end_span)
-    const UPLOAD_PRESET = "iqbal_preset";[span_5](start_span)[span_5](end_span)
+    const CLOUD_NAME = "uy00rl24";[span_1](start_span)[span_1](end_span)
+    const UPLOAD_PRESET = "iqbal_preset";
 
     function toggleUploadModal() {
         const modal = document.getElementById('uploadModal');
@@ -104,40 +105,37 @@
         const captionInput = document.getElementById('captionInput');
         
         if (fileInput.files.length === 0) {
-            alert("Please select a video or photo first!");
+            alert("Please select a file!");
             return;
         }
 
         const file = fileInput.files[0];
         const formData = new FormData();
         formData.append("file", file);
-        formData.append("upload_preset", UPLOAD_PRESET);[span_6](start_span)[span_6](end_span)
+        formData.append("upload_preset", UPLOAD_PRESET);
 
-        alert("Uploading to Cloudinary, please wait...");
+        alert("Uploading...");
 
         try {
             const resourceType = file.type.startsWith('image') ? 'image' : 'video';
-            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, {[span_7](start_span)[span_7](end_span)
+            const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`, {[span_2](start_span)[span_2](end_span)
                 method: "POST",
                 body: formData
             });
 
             const data = await response.json();
             if (data.secure_url) {
-                alert("Upload Successful!");
-                
-                // Naya post feed mein add karne ke liye
+                alert("Success!");
                 addNewPostToFeed(data.secure_url, captionInput.value, resourceType);
-                
                 toggleUploadModal();
                 fileInput.value = '';
                 captionInput.value = '';
             } else {
-                alert("Upload failed. Try again.");
+                alert("Failed!");
             }
         } catch (error) {
             console.error("Error:", error);
-            alert("An error occurred during upload.");
+            alert("Error occurred!");
         }
     }
 
@@ -151,26 +149,28 @@
                 <video src="${url}" controls autoplay loop muted playsinline style="width:100%; height:100%; object-fit:cover;"></video>
                 <div class="overlay">
                     <h3>@iqbal_user</h3>
-                    <p>${caption || 'My new TikTok video'}</p>
-                    <p style="font-size:12px; color:#ccc;">#fyp #viral</p>
+                    <p>${caption || 'My video'}</p>
+                    <div class="music-info">🎵 Original Sound</div>
                 </div>
                 <div class="side-actions">
                     <button class="action-btn" onclick="this.style.color='red'">❤️<span>1</span></button>
                     <button class="action-btn">💬<span>0</span></button>
+                    <button class="action-btn" onclick="window.open('${url}')">📥<span>Save</span></button>
                     <button class="action-btn">↗️<span>Share</span></button>
                 </div>
             `;
         } else {
             card.innerHTML = `
-                <img src="${url}" alt="Uploaded Image" style="width:100%; height:100%; object-fit:cover;">
+                <img src="${url}" style="width:100%; height:100%; object-fit:cover;">
                 <div class="overlay">
                     <h3>@iqbal_user</h3>
-                    <p>${caption || 'My new photo'}</p>
-                    <p style="font-size:12px; color:#ccc;">#photo #viral</p>
+                    <p>${caption || 'My photo'}</p>
+                    <div class="music-info">🎵 Original Sound</div>
                 </div>
                 <div class="side-actions">
                     <button class="action-btn" onclick="this.style.color='red'">❤️<span>1</span></button>
                     <button class="action-btn">💬<span>0</span></button>
+                    <button class="action-btn" onclick="window.open('${url}')">📥<span>Save</span></button>
                     <button class="action-btn">↗️<span>Share</span></button>
                 </div>
             `;
