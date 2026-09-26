@@ -6,7 +6,6 @@
 <meta name="theme-color" content="#000000">
 <title>Iqbal Video - Short Videos</title>
 
-<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -192,8 +191,15 @@ html,body{
   margin-bottom:2px;
 }
 
-.add{
-  font-size:32px;
+.add-upload-btn {
+  background: #ff315b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
 }
 
 .modal{
@@ -231,13 +237,17 @@ html,body{
   gap:10px;
 }
 
-.pick button{
+.pick label {
   padding:17px;
   border:0;
   border-radius:12px;
   font-size:15px;
   background:#eee;
+  color:#111;
+  text-align:center;
+  font-weight:bold;
   cursor:pointer;
+  display:block;
 }
 
 .form{
@@ -295,13 +305,11 @@ html,body{
 
 <div class="app">
 
-<!-- VIDEO FEED -->
 <div class="feed" id="feed">
-  <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#888;">Loading global feed...</div>
+  <div style="display:flex; justify-content:center; align-items:center; height:100%; color:#888;">Loading feed...</div>
 </div>
 
 
-<!-- PROFILE -->
 <div class="profile" id="profile">
 
 <button onclick="closeProfile()">
@@ -330,7 +338,6 @@ Your Videos
 </div>
 
 
-<!-- BOTTOM NAVIGATION -->
 <div class="bottom">
 
 <button class="nav" onclick="home()">
@@ -343,8 +350,8 @@ Home
 Search
 </button>
 
-<button class="nav add" onclick="openUpload()">
-＋
+<button class="add-upload-btn" onclick="openUpload()">
++ Upload
 </button>
 
 <button class="nav">
@@ -360,7 +367,6 @@ Profile
 </div>
 
 
-<!-- UPLOAD MODAL -->
 <div class="modal" id="modal">
 
 <div class="sheet">
@@ -376,23 +382,12 @@ Create Video
 <br>
 
 <div class="pick">
-
-<button onclick="camera()">
-📷 Camera
-</button>
-
-<button onclick="gallery()">
-🖼️ Gallery
-</button>
-
+    <label for="cameraFile">📷 Camera</label>
+    <label for="galleryFile">🖼️ Gallery</label>
 </div>
 
-<input
-  id="file"
-  type="file"
-  accept="video/*"
-  style="display:none"
->
+<input id="cameraFile" type="file" accept="video/*" capture="environment" style="display:none">
+<input id="galleryFile" type="file" accept="video/*" style="display:none">
 
 <div class="form" id="form">
 
@@ -443,10 +438,10 @@ const db = firebase.database();
 
 const feed = document.getElementById("feed");
 const modal = document.getElementById("modal");
-const file = document.getElementById("file");
 const preview = document.getElementById("preview");
 
 let selectedVideoBase64 = "";
+let activeFileInput = null;
 
 /* LOAD VIDEOS FROM FIREBASE */
 function loadGlobalFeed() {
@@ -520,32 +515,28 @@ function openUpload(){
 function closeUpload(){
   modal.style.display="none";
   document.getElementById("form").style.display="none";
-  file.value="";
+  document.getElementById("cameraFile").value = "";
+  document.getElementById("galleryFile").value = "";
   selectedVideoBase64 = "";
 }
 
-function camera(){
-  file.setAttribute("capture","environment");
-  file.click();
+/* HANDLE FILE SELECTION FOR BOTH */
+function handleFileSelect(event) {
+    const file = event.target.files[0];
+    if(!file) return;
+    
+    activeFileInput = event.target;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+        selectedVideoBase64 = reader.result;
+        preview.src = selectedVideoBase64;
+        document.getElementById("form").style.display = "block";
+    };
 }
 
-function gallery(){
-  file.removeAttribute("capture");
-  file.click();
-}
-
-/* FILE SELECT & CONVERT TO BASE64 */
-file.addEventListener("change", function(){
-  if(!file.files[0]) return;
-  
-  const reader = new FileReader();
-  reader.readAsDataURL(file.files[0]);
-  reader.onloadend = function() {
-      selectedVideoBase64 = reader.result;
-      preview.src = selectedVideoBase64;
-      document.getElementById("form").style.display = "block";
-  };
-});
+document.getElementById("cameraFile").addEventListener("change", handleFileSelect);
+document.getElementById("galleryFile").addEventListener("change", handleFileSelect);
 
 /* VIDEO CONTROLS */
 function setupCard(card){
@@ -646,7 +637,6 @@ function home(){
   feed.scrollTo({ top:0, behavior:"smooth" });
 }
 
-// Load feed on startup
 window.onload = loadGlobalFeed;
 </script>
 
