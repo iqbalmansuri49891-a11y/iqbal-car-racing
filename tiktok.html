@@ -3,215 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iqbal Tok - Short Video Platform</title>
-
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-
+    <title>Iqbal Tok - Final Working App</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Roboto, sans-serif; }
-        body { background-color: #000; color: #fff; height: 100vh; overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
+        body { background: #000; color: #fff; height: 100vh; overflow: hidden; }
 
         /* Top Header */
-        .top-header { position: absolute; top: 0; left: 0; width: 100%; display: flex; justify-content: center; gap: 20px; padding: 15px; z-index: 10; font-size: 16px; font-weight: 600; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
-        .top-header span { opacity: 0.6; cursor: pointer; }
-        .top-header span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 4px; }
+        .header { position: fixed; top: 0; left: 0; width: 100%; display: flex; justify-content: center; gap: 20px; padding: 15px; z-index: 10; font-size: 16px; font-weight: bold; background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent); }
+        .header span { opacity: 0.6; }
+        .header span.active { opacity: 1; border-bottom: 2px solid #fff; padding-bottom: 4px; }
 
-        /* Video Feed Container */
-        #feed-container { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; background: #000; }
-        .video-card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; background: #000; }
-        .video-card video { width: 100%; height: 100%; object-fit: cover; }
+        /* Feed */
+        #feed { width: 100vw; height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; }
+        .card { width: 100vw; height: 100vh; scroll-snap-align: start; position: relative; display: flex; justify-content: center; align-items: center; background: #111; }
+        .card video { width: 100%; height: 100%; object-fit: cover; }
 
-        /* Video Info Overlay */
-        .video-info { position: absolute; bottom: 75px; left: 16px; right: 80px; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
-        .username { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
-        .caption { font-size: 14px; margin-bottom: 8px; opacity: 0.95; }
-        .music { font-size: 13px; opacity: 0.85; display: flex; align-items: center; gap: 6px; }
+        /* Video Info */
+        .info { position: absolute; bottom: 80px; left: 16px; right: 80px; z-index: 5; text-shadow: 0 1px 2px rgba(0,0,0,0.8); }
+        .info h3 { font-size: 16px; margin-bottom: 6px; }
+        .info p { font-size: 14px; opacity: 0.9; }
 
-        /* Right Action Buttons */
-        .action-sidebar { position: absolute; bottom: 85px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: center; gap: 18px; }
-        .action-btn { background: rgba(0,0,0,0.3); width: 46px; height: 46px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; font-size: 11px; gap: 2px; border: none; color: #fff; }
-        .action-btn svg { width: 26px; height: 26px; fill: #fff; }
+        /* Action Buttons on Right */
+        .sidebar { position: absolute; bottom: 90px; right: 15px; z-index: 5; display: flex; flex-direction: column; gap: 15px; align-items: center; }
+        .side-btn { background: rgba(0,0,0,0.4); border: none; color: #fff; width: 45px; height: 45px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 10px; cursor: pointer; }
 
-        /* Bottom Navigation Bar */
-        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; align-items: center; z-index: 50; border-top: 1px solid #222; }
-        .nav-item { color: #777; font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+        /* Bottom Navbar */
+        .navbar { position: fixed; bottom: 0; left: 0; width: 100%; height: 60px; background: #000; display: flex; justify-content: space-around; align-items: center; z-index: 20; border-top: 1px solid #222; }
+        .nav-item { color: #888; font-size: 11px; text-align: center; cursor: pointer; }
         .nav-item.active { color: #fff; }
-        .nav-item svg { width: 22px; height: 22px; fill: currentColor; margin-bottom: 2px; }
         
-        /* Upload Label Button acting as + */
-        .add-post-label { background: #ff3b5c; width: 44px; height: 28px; border-radius: 8px; display: flex; justify-content: center; align-items: center; color: #fff; font-size: 22px; font-weight: bold; cursor: pointer; }
+        /* Upload Button styling */
+        .upload-tab { background: #ff3b5c; color: #fff; padding: 8px 16px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
 
-    <div class="top-header">
+    <div class="header">
         <span>Following</span>
         <span class="active">For You</span>
     </div>
 
-    <div id="feed-container">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading Iqbal Tok...</div>
-    </div>
-
-    <div class="bottom-nav">
-        <div class="nav-item active">
-            <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-            Home
-        </div>
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-            Discover
-        </div>
-        
-        <label for="nativeVideoInput" class="add-post-label">+</label>
-        
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-            Inbox
-        </div>
-        <div class="nav-item">
-            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-            Me
+    <div id="feed">
+        <div class="card">
+            <video src="https://www.w3schools.com/html/mov_bbb.mp4" autoplay loop playsinline muted onclick="this.paused ? this.play() : this.pause()"></video>
+            <div class="info">
+                <h3>@iqbal_official</h3>
+                <p>Welcome to Iqbal Tok! Tap video to play/pause.</p>
+            </div>
+            <div class="sidebar">
+                <button class="side-btn" onclick="alert('Liked!')">❤️<br>10K</button>
+                <button class="side-btn" onclick="alert('Saved!')">💾<br>Save</button>
+            </div>
         </div>
     </div>
 
-    <input type="file" id="nativeVideoInput" accept="video/*" style="display: none;" onchange="uploadFile(event)">
+    <div class="navbar">
+        <div class="nav-item active">🏠<br>Home</div>
+        <div class="nav-item">🔍<br>Discover</div>
+        
+        <label for="fileInput" class="upload-tab">+ Upload</label>
+        
+        <div class="nav-item">📥<br>Inbox</div>
+        <div class="nav-item">👤<br>Me</div>
+    </div>
+
+    <input type="file" id="fileInput" accept="video/*" style="display: none;" onchange="handleUpload(event)">
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSy...",
-            authDomain: "iqbal-app-store.firebaseapp.com",
-            databaseURL: "https://iqbal-app-store-default-rtdb.firebaseio.com",
-            projectId: "iqbal-app-store",
-            storageBucket: "iqbal-app-store.appspot.com",
-            messagingSenderId: "123786659122",
-            appId: "1:123786659122:web:df6d6ab40065f77882fab"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // Load Global Feed
-        function loadGlobalFeed() {
-            db.ref('videos').on('value', (snapshot) => {
-                const data = snapshot.val();
-                const feedContainer = document.getElementById('feed-container');
-                if (data) {
-                    let videos = Object.keys(data).map(key => data[key]).reverse();
-                    let html = '';
-                    videos.forEach(v => {
-                        html += `
-                            <div class="video-card">
-                                <video src="${v.videoUrl}" loop playsinline onclick="togglePlay(this)"></video>
-                                <div class="video-info">
-                                    <div class="username">@${v.username || 'iqbal_creator'}</div>
-                                    <div class="caption">${v.caption || 'Awesome video! #iqbaltok'}</div>
-                                    <div class="music">🎵 Original Sound - Iqbal Tok</div>
-                                </div>
-                                <div class="action-sidebar">
-                                    <button class="action-btn" onclick="likeVideo(this)">
-                                        <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                        <span>${v.likes || '15K'}</span>
-                                    </button>
-                                    <button class="action-btn" onclick="downloadVideo('${v.videoUrl}')">
-                                        <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                                        <span>Save</span>
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    feedContainer.innerHTML = html;
-                    setupAutoplay();
-                } else {
-                    feedContainer.innerHTML = `
-                        <div class="video-card">
-                            <video src="https://www.w3schools.com/html/mov_bbb.mp4" loop playsinline autoplay muted onclick="togglePlay(this)"></video>
-                            <div class="video-info">
-                                <div class="username">@iqbal_official</div>
-                                <div class="caption">Welcome to Iqbal Tok! #iqbaltok</div>
-                                <div class="music">🎵 Original Sound - Iqbal Tok</div>
-                            </div>
-                            <div class="action-sidebar">
-                                <button class="action-btn" onclick="likeVideo(this)">
-                                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                                    <span>50K</span>
-                                </button>
-                                <button class="action-btn" onclick="downloadVideo('https://www.w3schools.com/html/mov_bbb.mp4')">
-                                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                                    <span>Save</span>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-        }
-
-        function togglePlay(video) {
-            video.paused ? video.play() : video.pause();
-        }
-
-        function downloadVideo(url) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.target = '_blank';
-            a.download = 'iqbal-tok-video.mp4';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        function likeVideo(btn) {
-            btn.style.color = '#ff3b5c';
-            let svg = btn.querySelector('svg');
-            if(svg) svg.style.fill = '#ff3b5c';
-        }
-
-        // Direct Native Upload Function
-        function uploadFile(event) {
+        function handleUpload(event) {
             const file = event.target.files[0];
             if (file) {
-                alert('Video select ho gayi hai! Upload ho rahi hai, thoda intezaar karein...');
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onloadend = function() {
-                    const newRef = db.ref('videos').push();
-                    newRef.set({
-                        videoUrl: reader.result,
-                        username: "iqbal_creator",
-                        caption: "My video #iqbaltok",
-                        likes: Math.floor(Math.random() * 5000) + 100
-                    }, (error) => {
-                        if (error) {
-                            alert('Upload mein error aaya!');
-                        } else {
-                            alert('Video successfully upload ho gayi hai!');
-                        }
-                    });
-                };
+                const url = URL.createObjectURL(file);
+                const feed = document.getElementById('feed');
+                
+                const newCard = document.createElement('div');
+                newCard.className = 'card';
+                newCard.innerHTML = `
+                    <video src="${url}" autoplay loop playsinline onclick="this.paused ? this.play() : this.pause()"></video>
+                    <div class="info">
+                        <h3>@iqbal_creator</h3>
+                        <p>My uploaded video #iqbaltok</p>
+                    </div>
+                    <div class="sidebar">
+                        <button class="side-btn" onclick="alert('Liked!')">❤️<br>120</button>
+                        <button class="side-btn" onclick="alert('Saved!')">💾<br>Save</button>
+                    </div>
+                `;
+                
+                feed.prepend(newCard);
+                alert('Aapki video successfully add ho gayi hai!');
             }
         }
-
-        function setupAutoplay() {
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    let video = entry.target.querySelector('video');
-                    if (video) {
-                        if (entry.isIntersecting) {
-                            video.play().catch(() => {});
-                        } else {
-                            video.pause();
-                        }
-                    }
-                });
-            }, { threshold: 0.6 });
-
-            document.querySelectorAll('.video-card').forEach(card => observer.observe(card));
-        }
-
-        window.onload = loadGlobalFeed;
     </script>
 </body>
 </html>
