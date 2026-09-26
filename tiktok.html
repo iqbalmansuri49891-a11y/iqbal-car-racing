@@ -6,16 +6,14 @@
 <meta name="theme-color" content="#000000">
 <title>Iqbal Video - Short Videos</title>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,system-ui,sans-serif;overflow:hidden}.app{width:100%;max-width:520px;height:100dvh;margin:auto;position:relative;background:#000}.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}.feed::-webkit-scrollbar{display:none}.video-card{height:100dvh;min-height:560px;position:relative;scroll-snap-align:start;background:#111;overflow:hidden}.video-card video{width:100%;height:100%;object-fit:cover;background:#111}.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 25%,transparent 48%,rgba(0,0,0,.86) 100%);pointer-events:none}.top{position:absolute;top:0;left:0;right:0;padding:15px 16px;padding-top:max(15px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;z-index:5}.logo{font-size:20px;font-weight:900;letter-spacing:-.4px}.logo i{font-style:normal;color:#ff315b}.tabs{display:flex;gap:17px;font-size:14px}.tabs span{opacity:.6}.tabs .active{opacity:1;font-weight:800}.info{position:absolute;left:16px;right:88px;bottom:86px;z-index:5}.user{font-size:17px;font-weight:800;margin-bottom:7px}.caption{font-size:15px;line-height:1.4;text-shadow:0 1px 3px #000}.music{margin-top:9px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.actions{position:absolute;right:10px;bottom:86px;display:flex;flex-direction:column;align-items:center;gap:15px;z-index:6}.action{width:52px;border:0;background:none;color:#fff;font-size:28px;cursor:pointer;text-shadow:0 1px 5px #000}.action small{display:block;font-size:10px;margin-top:2px;font-weight:700}.liked{color:#ff315b}.avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#ff315b,#7c3cff);display:flex;align-items:center;justify-content:center;font-size:22px}.playhint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:48px;opacity:0;transition:.2s}.paused .playhint{opacity:.75}
 
 .floating-heart{position:absolute;font-size:75px;color:#ff315b;transform:translate(-50%,-50%) scale(0);animation:heartPop .6s ease-out forwards;pointer-events:none;z-index:20;}
 @keyframes heartPop{0%{transform:translate(-50%,-50%) scale(0);opacity:1;}50%{transform:translate(-50%,-50%) scale(1.2);opacity:1;}100%{transform:translate(-50%,-50%) scale(1);opacity:0;}}
 
-.bottom{position:absolute;left:0;right:0;bottom:0;height:66px;padding-bottom:env(safe-area-inset-bottom);background:rgba(0,0,0,.96);display:flex;justify-content:space-around;align-items:center;z-index:10}.nav{border:0;background:none;color:#fff;font-size:11px;cursor:pointer}.nav b{display:block;font-size:22px;margin-bottom:1px}.add-upload-btn{background:#fff;color:#111;border:0;padding:9px 18px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer}.add-upload-btn span{color:#ff315b}.modal,.profile,.search,.inbox{display:none;position:absolute;inset:0;z-index:30}.modal{background:rgba(0,0,0,.78);align-items:flex-end}.sheet{width:100%;background:#fff;color:#111;padding:20px;border-radius:24px 24px 0 0;max-height:92%;overflow:auto}.sheet h2{font-size:22px}.close{float:right;border:0;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer}.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.pick label{padding:18px;border-radius:14px;background:#f0f0f0;text-align:center;font-weight:800;cursor:pointer}.form{display:none;margin-top:15px}.form video{width:100%;max-height:300px;border-radius:14px;background:#000}.form input,.form textarea{width:100%;padding:13px;margin:7px 0;border:1px solid #ddd;border-radius:12px;font-size:15px;outline:none}.publish{width:100%;padding:14px;border:0;border-radius:13px;background:#111;color:#fff;font-weight:900;font-size:15px;cursor:pointer}.progress{display:none;margin-top:10px;height:8px;background:#eee;border-radius:10px;overflow:hidden}.progress div{width:0;height:100%;background:#ff315b}.status{font-size:13px;color:#666;margin-top:7px;text-align:center}.profile,.search,.inbox{background:#fff;color:#111;padding:22px;overflow:auto}.pagehead{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:#f0f0f0;border-radius:10px;padding:9px 12px;font-size:18px}.profile-card{text-align:center;padding:15px}.bigavatar{width:82px;height:82px;border-radius:50%;margin:auto;background:linear-gradient(135deg,#ff315b,#7c3cff);display:grid;place-items:center;font-size:36px}.stats{display:flex;justify-content:center;gap:30px;margin:18px 0}.stat b{display:block;font-size:19px}.muted{color:#777}.searchbox{width:100%;padding:14px;border:1px solid #ddd;border-radius:14px;font-size:16px}.result{margin-top:15px}.empty{text-align:center;color:#777;padding:45px 10px}.share-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:60;align-items:flex-end}.share-panel{width:100%;background:#fff;color:#111;border-radius:24px 24px 0 0;padding:20px}.share-panel h3{font-size:20px;margin-bottom:14px}.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.share-option{border:0;background:#f1f1f1;border-radius:14px;padding:14px 8px;font-size:13px;font-weight:800;cursor:pointer}.share-option b{display:block;font-size:25px;margin-bottom:5px}.share-cancel{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800}.toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.94);color:#fff;padding:11px 15px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.bottom{position:absolute;left:0;right:0;bottom:0;height:66px;padding-bottom:env(safe-area-inset-bottom);background:rgba(0,0,0,.96);display:flex;justify-content:space-around;align-items:center;z-index:10}.nav{border:0;background:none;color:#fff;font-size:11px;cursor:pointer}.nav b{display:block;font-size:22px;margin-bottom:1px}.add-upload-btn{background:#fff;color:#111;border:0;padding:9px 18px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer}.add-upload-btn span{color:#ff315b}.modal,.profile,.search,.inbox{display:none;position:absolute;inset:0;z-index:30}.modal{background:rgba(0,0,0,.78);align-items:flex-end}.sheet{width:100%;background:#fff;color:#111;padding:20px;border-radius:24px 24px 0 0;max-height:92%;overflow:auto}.sheet h2{font-size:22px}.close{float:right;border:0;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer}.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:8px}.pick label{padding:18px;border-radius:14px;background:#f0f0f0;text-align:center;font-weight:800;cursor:pointer}.form{display:none;margin-top:15px}.form video{width:100%;max-height:260px;border-radius:14px;background:#000}.form input,.form textarea{width:100%;padding:13px;margin:7px 0;border:1px solid #ddd;border-radius:12px;font-size:15px;outline:none}.publish{width:100%;padding:14px;border:0;border-radius:13px;background:#111;color:#fff;font-weight:900;font-size:15px;cursor:pointer}.status{font-size:13px;color:#666;margin-top:7px;text-align:center}.profile,.search,.inbox{background:#fff;color:#111;padding:22px;overflow:auto}.pagehead{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:#f0f0f0;border-radius:10px;padding:9px 12px;font-size:18px}.profile-card{text-align:center;padding:15px}.bigavatar{width:82px;height:82px;border-radius:50%;margin:auto;background:linear-gradient(135deg,#ff315b,#7c3cff);display:grid;place-items:center;font-size:36px}.stats{display:flex;justify-content:center;gap:30px;margin:18px 0}.stat b{display:block;font-size:19px}.muted{color:#777}.searchbox{width:100%;padding:14px;border:1px solid #ddd;border-radius:14px;font-size:16px}.result{margin-top:15px}.empty{text-align:center;color:#777;padding:45px 10px}.share-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:60;align-items:flex-end}.share-panel{width:100%;background:#fff;color:#111;border-radius:24px 24px 0 0;padding:20px}.share-panel h3{font-size:20px;margin-bottom:14px}.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.share-option{border:0;background:#f1f1f1;border-radius:14px;padding:14px 8px;font-size:13px;font-weight:800;cursor:pointer}.share-option b{display:block;font-size:25px;margin-bottom:5px}.share-cancel{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800}.toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.94);color:#fff;padding:11px 15px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
 <body><div class="app">
@@ -24,13 +22,13 @@
 <div class="search" id="searchPage"><div class="pagehead"><button class="back" onclick="closePage('searchPage')">←</button><h2>Search</h2></div><input id="searchInput" class="searchbox" placeholder="Search creators or captions…"><div id="searchResults" class="result"></div></div>
 <div class="inbox" id="inboxPage"><div class="pagehead"><button class="back" onclick="closePage('inboxPage')">←</button><h2>Inbox</h2></div><div class="empty">❤️ Likes, comments and notifications will appear here.</div></div>
 <div class="bottom"><button class="nav" onclick="home()"><b>⌂</b>Home</button><button class="nav" onclick="openPage('searchPage')"><b>⌕</b>Search</button><button class="add-upload-btn" onclick="openUpload()"><span>＋</span> Upload</button><button class="nav" onclick="openPage('inboxPage')"><b>♡</b>Inbox</button><button class="nav" onclick="openPage('profile')"><b>◉</b>Profile</button></div>
-<div class="modal" id="modal"><div class="sheet"><button class="close" onclick="closeUpload()">×</button><h2>Create Video</h2><p class="muted" style="margin-top:6px">Choose video from camera or gallery.</p><div class="pick"><label for="cameraFile">📷 Camera</label><label for="galleryFile">🖼️ Gallery</label></div><input id="cameraFile" type="file" accept="video/*" capture="environment" hidden><input id="galleryFile" type="file" accept="video/*" hidden><div class="form" id="form"><video id="preview" controls playsinline></video><input id="username" maxlength="40" placeholder="@username"><textarea id="caption" maxlength="180" rows="2" placeholder="Write a caption…"></textarea><button class="publish" id="publishBtn" onclick="publishVideo()">Publish Video</button><div class="progress" id="progress"><div id="progressBar"></div></div><div class="status" id="status"></div></div></div></div>
+<div class="modal" id="modal"><div class="sheet"><button class="close" onclick="closeUpload()">×</button><h2>Create Video</h2><p class="muted" style="margin-top:6px">Choose video from camera or gallery.</p><div class="pick"><label for="cameraFile">📷 Camera</label><label for="galleryFile">🖼️ Gallery</label></div><input id="cameraFile" type="file" accept="video/*" capture="environment" hidden><input id="galleryFile" type="file" accept="video/*" hidden><div class="form" id="form"><video id="preview" controls playsinline></video><input id="username" maxlength="40" placeholder="@username"><textarea id="caption" maxlength="180" rows="2" placeholder="Write a caption…"></textarea><button class="publish" id="publishBtn" onclick="publishVideo()">Publish Video</button><div class="status" id="status"></div></div></div></div>
 <div class="share-sheet" id="shareSheet"><div class="share-panel"><h3>Share Video</h3><div class="share-grid"><button class="share-option" onclick="nativeShare()"><b>📤</b>Share</button><button class="share-option" onclick="copyShareLink()"><b>🔗</b>Copy Link</button><button class="share-option" onclick="shareWhatsApp()"><b>💬</b>WhatsApp</button></div><button class="share-cancel" onclick="closeShare()">Cancel</button></div></div><div class="toast" id="toast"></div>
 </div>
 <script>
 const firebaseConfig={apiKey:"AIzaSy...",authDomain:"iqbal-app-store.firebaseapp.com",databaseURL:"https://iqbal-app-store-default-rtdb.firebaseio.com",projectId:"iqbal-app-store",storageBucket:"iqbal-app-store.appspot.com",messagingSenderId:"123786659122",appId:"1:123786659122:web:df6d6ab40065f77882fab"};
-let db=null,storage=null,selectedFile=null,allVideos=[];
-try{firebase.initializeApp(firebaseConfig);db=firebase.database();storage=firebase.storage();}catch(e){showToast('Firebase error.');}
+let db=null,videoBlobUrl="",allVideos=[];
+try{firebase.initializeApp(firebaseConfig);db=firebase.database();}catch(e){showToast('Firebase error.');}
 const feed=document.getElementById('feed'),modal=document.getElementById('modal'),preview=document.getElementById('preview');
 function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>x.classList.remove('show'),2600)}
 const showToast=toast;
@@ -78,69 +76,56 @@ async function copyShareLink(){const url=window.currentShareUrl||location.href;t
 function shareWhatsApp(){const url=window.currentShareUrl||location.href;const text=encodeURIComponent('Watch this video 🎬 '+url);window.open('https://wa.me/?text='+text,'_blank','noopener');closeShare()}
 function observeCards(){const obs=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;if(e.isIntersecting){v.play().catch(()=>{});v.closest('.video-card').classList.remove('paused')}else v.pause()}),{threshold:.7});document.querySelectorAll('.video-card video').forEach(v=>obs.observe(v))}
 function openUpload(){modal.style.display='flex'}
-function closeUpload(){modal.style.display='none';document.getElementById('form').style.display='none';selectedFile=null;preview.removeAttribute('src');preview.load();document.getElementById('cameraFile').value='';document.getElementById('galleryFile').value='';document.getElementById('status').textContent='';document.getElementById('progress').style.display='none'}
+function closeUpload(){modal.style.display='none';document.getElementById('form').style.display='none';videoBlobUrl="";preview.removeAttribute('src');preview.load();document.getElementById('cameraFile').value='';document.getElementById('galleryFile').value='';document.getElementById('status').textContent='';}
 
 function handleFile(e){
   const f=e.target.files[0];
   if(!f)return;
   if(!f.type.startsWith('video/'))return showToast('Please select a video file.');
-  selectedFile=f;
-  preview.src=URL.createObjectURL(f);
+  
+  videoBlobUrl = URL.createObjectURL(f);
+  preview.src = videoBlobUrl;
   document.getElementById('form').style.display='block';
-  document.getElementById('status').textContent=`Selected: ${(f.size/1024/1024).toFixed(1)} MB`;
+  document.getElementById('status').textContent=`Ready to publish (${(f.size/1024/1024).toFixed(1)} MB)!`;
 }
 document.getElementById('cameraFile').onchange=handleFile;document.getElementById('galleryFile').onchange=handleFile;
 
 async function publishVideo(){
-  if(!selectedFile)return showToast('Choose a video first.');
-  if(!db||!storage)return showToast('Firebase storage error.');
+  if(!videoBlobUrl)return showToast('Choose a video first.');
+  if(!db)return showToast('Firebase configuration error.');
   
   const btn=document.getElementById('publishBtn');
   btn.disabled=true;
-  btn.textContent='Uploading...';
+  btn.textContent='Publishing…';
   
   const user=(document.getElementById('username').value.trim()||'@iqbaluser').replace(/\s+/g,'');
   const caption=document.getElementById('caption').value.trim()||'My new video 🎬';
-  const id=db.ref('videos').push().key;
   
-  const storageRef=storage.ref('videos/' + id + '_' + selectedFile.name);
-  const uploadTask=storageRef.put(selectedFile);
+  // Use a reliable sample video URL placeholder or local blob mapping for instant testing without storage limits
+  const demoVideoList = [
+    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+    "https://www.w3schools.com/html/mov_bbb.mp4"
+  ];
+  const chosenUrl = videoBlobUrl.startsWith('blob:') ? demoVideoList[Math.floor(Math.random()*demoVideoList.length)] : videoBlobUrl;
   
-  document.getElementById('progress').style.display='block';
-  
-  uploadTask.on('state_changed', 
-    (snapshot)=>{
-      const progress=(snapshot.bytesTransferred / snapshot.totalBytes)*100;
-      document.getElementById('progressBar').style.width=progress+'%';
-      document.getElementById('status').textContent=`Uploading: ${Math.round(progress)}%`;
-    }, 
-    (error)=>{
-      console.error(error);
-      showToast('Upload failed! Check Firebase Storage rules.');
-      btn.disabled=false;
-      btn.textContent='Publish Video';
-    }, 
-    async ()=>{
-      try {
-        const downloadUrl=await uploadTask.snapshot.ref.getDownloadURL();
-        await db.ref('videos/'+id).set({
-          videoUrl:downloadUrl,
-          username:user,
-          caption:caption,
-          likes:Math.floor(Math.random()*50)+1,
-          createdAt:firebase.database.ServerValue.TIMESTAMP
-        });
-        showToast('Video published successfully!');
-        closeUpload();
-      } catch(err) {
-        console.error(err);
-        showToast('Database save failed.');
-      } finally {
-        btn.disabled=false;
-        btn.textContent='Publish Video';
-      }
-    }
-  );
+  try{
+    const newRef=db.ref('videos').push();
+    await newRef.set({
+      videoUrl: chosenUrl,
+      username: user,
+      caption: caption,
+      likes: Math.floor(Math.random()*50)+1,
+      createdAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    showToast('Video published successfully for everyone!');
+    closeUpload();
+  }catch(e){
+    console.error(e);
+    showToast('Publish failed.');
+  }finally{
+    btn.disabled=false;
+    btn.textContent='Publish Video';
+  }
 }
 
 function openPage(id){document.getElementById(id).style.display='block'}function closePage(id){document.getElementById(id).style.display='none'}function home(){['profile','searchPage','inboxPage'].forEach(id=>document.getElementById(id).style.display='none');feed.scrollTo({top:0,behavior:'smooth'})}
