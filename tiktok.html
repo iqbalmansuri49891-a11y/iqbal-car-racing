@@ -27,7 +27,7 @@
 </div>
 <script>
 const firebaseConfig={apiKey:"AIzaSy...",authDomain:"iqbal-app-store.firebaseapp.com",databaseURL:"https://iqbal-app-store-default-rtdb.firebaseio.com",projectId:"iqbal-app-store",storageBucket:"iqbal-app-store.appspot.com",messagingSenderId:"123786659122",appId:"1:123786659122:web:df6d6ab40065f77882fab"};
-let db=null,videoBlobUrl="",allVideos=[];
+let db=null,base64VideoData="",allVideos=[];
 try{firebase.initializeApp(firebaseConfig);db=firebase.database();}catch(e){showToast('Firebase error.');}
 const feed=document.getElementById('feed'),modal=document.getElementById('modal'),preview=document.getElementById('preview');
 function toast(t){const x=document.getElementById('toast');x.textContent=t;x.classList.add('show');clearTimeout(window._toast);window._toast=setTimeout(()=>x.classList.remove('show'),2600)}
@@ -76,23 +76,28 @@ async function copyShareLink(){const url=window.currentShareUrl||location.href;t
 function shareWhatsApp(){const url=window.currentShareUrl||location.href;const text=encodeURIComponent('Watch this video 🎬 '+url);window.open('https://wa.me/?text='+text,'_blank','noopener');closeShare()}
 function observeCards(){const obs=new IntersectionObserver(es=>es.forEach(e=>{const v=e.target;if(e.isIntersecting){v.play().catch(()=>{});v.closest('.video-card').classList.remove('paused')}else v.pause()}),{threshold:.7});document.querySelectorAll('.video-card video').forEach(v=>obs.observe(v))}
 function openUpload(){modal.style.display='flex'}
-function closeUpload(){modal.style.display='none';document.getElementById('form').style.display='none';videoBlobUrl="";preview.removeAttribute('src');preview.load();document.getElementById('cameraFile').value='';document.getElementById('galleryFile').value='';document.getElementById('status').textContent='';}
+function closeUpload(){modal.style.display='none';document.getElementById('form').style.display='none';base64VideoData="";preview.removeAttribute('src');preview.load();document.getElementById('cameraFile').value='';document.getElementById('galleryFile').value='';document.getElementById('status').textContent='';}
 
 function handleFile(e){
   const f=e.target.files[0];
   if(!f)return;
   if(!f.type.startsWith('video/'))return showToast('Please select a video file.');
   
-  videoBlobUrl = URL.createObjectURL(f);
-  preview.src = videoBlobUrl;
-  document.getElementById('form').style.display='block';
-  document.getElementById('status').textContent=`Ready to publish (${(f.size/1024/1024).toFixed(1)} MB)!`;
+  document.getElementById('status').textContent='Processing video...';
+  const reader = new FileReader();
+  reader.onload = function(uploadEvent) {
+    base64VideoData = uploadEvent.target.result;
+    preview.src = base64VideoData;
+    document.getElementById('form').style.display='block';
+    document.getElementById('status').textContent=`Ready to publish!`;
+  };
+  reader.readAsDataURL(f);
 }
 document.getElementById('cameraFile').onchange=handleFile;document.getElementById('galleryFile').onchange=handleFile;
 
 async function publishVideo(){
-  if(!videoBlobUrl)return showToast('Choose a video first.');
-  if(!db)return showToast('Firebase configuration error.');
+  if(!base64VideoData)return showToast('Choose a video first.');
+  if(!db)return showToast('Firebase error.');
   
   const btn=document.getElementById('publishBtn');
   btn.disabled=true;
@@ -101,17 +106,10 @@ async function publishVideo(){
   const user=(document.getElementById('username').value.trim()||'@iqbaluser').replace(/\s+/g,'');
   const caption=document.getElementById('caption').value.trim()||'My new video 🎬';
   
-  // Use a reliable sample video URL placeholder or local blob mapping for instant testing without storage limits
-  const demoVideoList = [
-    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-    "https://www.w3schools.com/html/mov_bbb.mp4"
-  ];
-  const chosenUrl = videoBlobUrl.startsWith('blob:') ? demoVideoList[Math.floor(Math.random()*demoVideoList.length)] : videoBlobUrl;
-  
   try{
     const newRef=db.ref('videos').push();
     await newRef.set({
-      videoUrl: chosenUrl,
+      videoUrl: base64VideoData,
       username: user,
       caption: caption,
       likes: Math.floor(Math.random()*50)+1,
@@ -121,7 +119,7 @@ async function publishVideo(){
     closeUpload();
   }catch(e){
     console.error(e);
-    showToast('Publish failed.');
+    showToast('Publish failed. Video might be too large.');
   }finally{
     btn.disabled=false;
     btn.textContent='Publish Video';
