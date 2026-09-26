@@ -6,39 +6,80 @@
 <meta name="theme-color" content="#000000">
 <title>Iqbal TikTok</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;background:#000;color:#fff;font-family:Arial,system-ui,sans-serif;overflow:hidden}.app{width:100%;max-width:520px;height:100dvh;margin:auto;position:relative;background:#000}.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}.feed::-webkit-scrollbar{display:none}.video-card{height:100dvh;min-height:560px;position:relative;scroll-snap-align:start;background:#111;overflow:hidden}.video-card video,.video-card img{width:100%;height:100%;object-fit:cover;background:#111}.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 25%,transparent 48%,rgba(0,0,0,.86) 100%);pointer-events:none}.top{position:absolute;top:0;left:0;right:0;padding:15px 16px;padding-top:max(15px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;z-index:5}.logo{font-size:20px;font-weight:900;letter-spacing:-.4px}.logo i{font-style:normal;color:#ff315b}.tabs{display:flex;gap:17px;font-size:14px}.tabs span{opacity:.6}.tabs .active{opacity:1;font-weight:800}.info{position:absolute;left:16px;right:95px;bottom:86px;z-index:5}.user{font-size:17px;font-weight:800;margin-bottom:7px}.caption{font-size:15px;line-height:1.4;text-shadow:0 1px 3px #000}.music{margin-top:9px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+*{box-sizing:border-box;margin:0;padding:0}html,body{width:100%;height:100%;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;overflow:hidden}.app{width:100%;max-width:520px;height:100dvh;margin:auto;position:relative;background:#000}.feed{height:100%;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}.feed::-webkit-scrollbar{display:none}.video-card{height:100dvh;min-height:560px;position:relative;scroll-snap-align:start;background:#111;overflow:hidden}.video-card video,.video-card img{width:100%;height:100%;object-fit:cover;background:#111}.shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.4),transparent 25%,transparent 45%,rgba(0,0,0,.9) 100%);pointer-events:none}.top{position:absolute;top:0;left:0;right:0;padding:16px;padding-top:max(16px,env(safe-area-inset-top));display:flex;align-items:center;justify-content:space-between;z-index:5}.logo{font-size:22px;font-weight:900;letter-spacing:-.5px}.logo i{font-style:normal;color:#fe2c55}.tabs{display:flex;gap:20px;font-size:15px}.tabs span{opacity:.6;cursor:pointer}.tabs .active{opacity:1;font-weight:800;border-bottom:2px solid #fff;padding-bottom:2px}.info{position:absolute;left:16px;right:95px;bottom:86px;z-index:5}.user{font-size:18px;font-weight:800;margin-bottom:8px;text-shadow:0 1px 3px rgba(0,0,0,.8)}.caption{font-size:15px;line-height:1.4;text-shadow:0 1px 3px rgba(0,0,0,.8)}.music{margin-top:10px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.9}
 
-/* Right Actions Spacing */
-.actions{position:absolute;right:12px;bottom:86px;display:flex;flex-direction:column;align-items:center;gap:20px;z-index:6}
-.action{width:52px;border:0;background:none;color:#fff;font-size:26px;cursor:pointer;text-shadow:0 1px 5px #000;display:flex;flex-direction:column;align-items:center}
+.actions{position:absolute;right:12px;bottom:86px;display:flex;flex-direction:column;align-items:center;gap:22px;z-index:6}
+.action{width:52px;border:0;background:none;color:#fff;font-size:26px;cursor:pointer;text-shadow:0 1px 5px rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center}
 .action small{display:block;font-size:11px;margin-top:4px;font-weight:700}
-.liked{color:#ff315b}
+.liked{color:#fe2c55}
 
-.avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#ff315b,#7c3cff);display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:5px}
-.playhint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:48px;opacity:0;transition:.2s}.paused .playhint{opacity:.75}
-.bottom{position:absolute;left:0;right:0;bottom:0;height:66px;padding-bottom:env(safe-area-inset-bottom);background:rgba(0,0,0,.96);display:flex;justify-content:space-around;align-items:center;z-index:10}.nav{border:0;background:none;color:#fff;font-size:11px;cursor:pointer}.nav b{display:block;font-size:22px;margin-bottom:1px}.add-upload-btn{background:#fff;color:#111;border:0;padding:9px 18px;border-radius:10px;font-weight:900;font-size:13px;cursor:pointer}.add-upload-btn span{color:#ff315b}.modal,.profile,.search,.inbox,.comment-modal{display:none;position:absolute;inset:0;z-index:30}.modal,.comment-modal{background:rgba(0,0,0,.78);align-items:flex-end}.sheet{width:100%;background:#fff;color:#111;padding:20px;border-radius:24px 24px 0 0;max-height:92%;overflow:auto}.sheet h2{font-size:22px}.close{float:right;border:0;border-radius:50%;width:36px;height:36px;font-size:22px;cursor:pointer}.pick{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}.pick label{padding:18px;border-radius:14px;background:#f0f0f0;text-align:center;font-weight:800;cursor:pointer}.form{display:none;margin-top:15px}.form video,.form img{width:100%;max-height:330px;border-radius:14px;background:#000;object-fit:cover}.form input,.form textarea{width:100%;padding:13px;margin:7px 0;border:1px solid #ddd;border-radius:12px;font-size:15px;outline:none}.publish{width:100%;padding:14px;border:0;border-radius:13px;background:#111;color:#fff;font-weight:900;font-size:15px;cursor:pointer}.progress{display:none;margin-top:10px;height:8px;background:#eee;border-radius:10px;overflow:hidden}.progress div{width:0;height:100%;background:#ff315b}.status{font-size:12px;color:#666;margin-top:7px}.profile,.search,.inbox{background:#fff;color:#111;padding:22px;overflow:auto}.pagehead{display:flex;align-items:center;gap:12px;margin-bottom:25px}.back{border:0;background:#f0f0f0;border-radius:10px;padding:9px 12px;font-size:18px}.profile-card{text-align:center;padding:15px}.bigavatar{width:82px;height:82px;border-radius:50%;margin:auto;background:linear-gradient(135deg,#ff315b,#7c3cff);display:grid;place-items:center;font-size:36px}.stats{display:flex;justify-content:center;gap:30px;margin:18px 0}.stat b{display:block;font-size:19px}.muted{color:#777}.searchbox{width:100%;padding:14px;border:1px solid #ddd;border-radius:14px;font-size:16px}.result{margin-top:15px}.empty{text-align:center;color:#777;padding:45px 10px}.share-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,.72);z-index:60;align-items:flex-end}.share-panel{width:100%;background:#fff;color:#111;border-radius:24px 24px 0 0;padding:20px}.share-panel h3{font-size:20px;margin-bottom:14px}.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.share-option{border:0;background:#f1f1f1;border-radius:14px;padding:14px 8px;font-size:13px;font-weight:800;cursor:pointer}.share-option b{display:block;font-size:25px;margin-bottom:5px}.share-cancel{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;background:#111;color:#fff;font-weight:800}.toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:rgba(20,20,20,.94);color:#fff;padding:11px 15px;border-radius:22px;font-size:13px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.avatar{width:48px;height:48px;border-radius:50%;border:2px solid #fff;background:linear-gradient(135deg,#fe2c55,#7c3cff);display:flex;align-items:center;justify-content:center;font-size:22px;margin-top:5px;box-shadow:0 4px 10px rgba(0,0,0,.5)}
+.playhint{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;font-size:54px;opacity:0;transition:.2s;color:rgba(255,255,255,.8)}.paused .playhint{opacity:.85}
 
-.double-heart{position:absolute;font-size:80px;transform:scale(0);transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275),opacity .3s;pointer-events:none;z-index:20;top:50%;left:50%;margin-top:-40px;margin-left:-40px}
+.bottom{position:absolute;left:0;right:0;bottom:0;height:66px;padding-bottom:env(safe-area-inset-bottom);background:rgba(18,18,18,.98);backdrop-filter:blur(10px);display:flex;justify-content:space-around;align-items:center;z-index:10;border-top:1px solid rgba(255,255,255,.1)}
+.nav{border:0;background:none;color:#888;font-size:11px;cursor:pointer;transition:.2s}.nav:hover{color:#fff}.nav b{display:block;font-size:22px;margin-bottom:2px}
+.add-upload-btn{background:linear-gradient(135deg,#fe2c55,#ff253a);color:#fff;border:0;padding:8px 20px;border-radius:12px;font-weight:900;font-size:14px;cursor:pointer;box-shadow:0 4px 15px rgba(254,44,85,.4);display:flex;align-items:center;gap:4px}
+.add-upload-btn span{font-size:18px}
+
+.modal,.profile,.search,.inbox,.comment-modal{display:none;position:absolute;inset:0;z-index:30}
+.modal,.comment-modal{background:rgba(0,0,0,.85);backdrop-filter:blur(5px);align-items:flex-end}
+.sheet{width:100%;background:#161616;color:#fff;padding:24px;border-radius:28px 28px 0 0;max-height:92%;overflow:auto;border-top:1px solid rgba(255,255,255,.15);box-shadow:0 -10px 30px rgba(0,0,0,.8)}
+.sheet h2{font-size:22px;font-weight:800}
+.close{float:right;border:0;background:rgba(255,255,255,.1);color:#fff;border-radius:50%;width:36px;height:36px;font-size:20px;cursor:pointer;display:grid;place-items:center;transition:.2s}.close:hover{background:rgba(255,255,255,.2)}
+.pick{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.pick label{padding:20px;border-radius:16px;background:#222;border:1px solid rgba(255,255,255,.1);text-align:center;font-weight:800;cursor:pointer;transition:.2s;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:15px}.pick label:hover{background:#2a2a2a;border-color:#fe2c55}
+
+.form{display:none;margin-top:20px}
+.form video,.form img{width:100%;max-height:280px;border-radius:16px;background:#000;object-fit:cover;border:1px solid rgba(255,255,255,.1)}
+.form input,.form textarea{width:100%;padding:14px;margin:10px 0;background:#222;border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:14px;font-size:15px;outline:none;transition:.2s}.form input:focus,.form textarea:focus{border-color:#fe2c55}
+.publish{width:100%;padding:15px;border:0;border-radius:14px;background:linear-gradient(135deg,#fe2c55,#ff253a);color:#fff;font-weight:900;font-size:16px;cursor:pointer;box-shadow:0 4px 15px rgba(254,44,85,.4);margin-top:5px}
+.progress{display:none;margin-top:12px;height:8px;background:#222;border-radius:10px;overflow:hidden}.progress div{width:0;height:100%;background:linear-gradient(90deg,#fe2c55,#ff253a);transition:width .2s}
+.status{font-size:13px;color:#aaa;margin-top:8px;text-align:center}
+
+.profile,.search,.inbox{background:#121212;color:#fff;padding:24px;overflow:auto}
+.pagehead{display:flex;align-items:center;gap:15px;margin-bottom:25px}
+.back{border:0;background:#222;color:#fff;border-radius:12px;padding:10px 14px;font-size:18px;cursor:pointer}
+.profile-card{text-align:center;padding:15px}
+.bigavatar{width:86px;height:86px;border-radius:50%;margin:auto;background:linear-gradient(135deg,#fe2c55,#7c3cff);display:grid;place-items:center;font-size:38px;box-shadow:0 6px 20px rgba(254,44,85,.4)}
+.stats{display:flex;justify-content:center;gap:35px;margin:20px 0}
+.stat b{display:block;font-size:20px}
+.muted{color:#888}
+.searchbox{width:100%;padding:15px;background:#222;border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:16px;font-size:16px;outline:none}
+.result{margin-top:20px}
+.empty{text-align:center;color:#777;padding:50px 20px;font-size:15px}
+
+.share-sheet{display:none;position:absolute;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(5px);z-index:60;align-items:flex-end}
+.share-panel{width:100%;background:#161616;color:#fff;border-radius:28px 28px 0 0;padding:24px;border-top:1px solid rgba(255,255,255,.15)}
+.share-panel h3{font-size:20px;margin-bottom:16px;font-weight:800}
+.share-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.share-option{border:0;background:#222;color:#fff;border-radius:16px;padding:16px 8px;font-size:13px;font-weight:800;cursor:pointer;transition:.2s}.share-option:hover{background:#2a2a2a}
+.share-option b{display:block;font-size:26px;margin-bottom:6px}
+.share-cancel{width:100%;margin-top:16px;padding:15px;border:0;border-radius:14px;background:#222;color:#fff;font-weight:800;cursor:pointer}
+
+.toast{position:absolute;left:50%;bottom:80px;transform:translateX(-50%) translateY(20px);background:rgba(30,30,30,.95);color:#fff;padding:12px 20px;border-radius:24px;font-size:14px;opacity:0;pointer-events:none;transition:.25s;z-index:50;white-space:nowrap;box-shadow:0 5px 20px rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.1)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.double-heart{position:absolute;font-size:90px;transform:scale(0);transition:transform .3s cubic-bezier(0.175,0.885,0.32,1.275),opacity .3s;pointer-events:none;z-index:20;top:50%;left:50%;margin-top:-45px;margin-left:-45px;filter:drop-shadow(0 4px 10px rgba(0,0,0,.5))}
 .double-heart.show{transform:scale(1);opacity:1}
 
-.comment-list{max-height:250px;overflow-y:auto;margin:15px 0}
-.comment-item{padding:8px 0;border-bottom:1px solid #eee;font-size:14px}
-.comment-item b{color:#333}
-.comment-input-box{display:flex;gap:8px;margin-top:10px}
-.comment-input-box input{flex:1;padding:10px;border:1px solid #ddd;border-radius:8px;outline:none}
-.comment-input-box button{padding:10px 16px;background:#ff315b;color:#fff;border:0;border-radius:8px;font-weight:bold;cursor:pointer}
+.comment-list{max-height:280px;overflow-y:auto;margin:15px 0}
+.comment-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.1);font-size:14px}
+.comment-item b{color:#fe2c55}
+.comment-input-box{display:flex;gap:10px;margin-top:12px}
+.comment-input-box input{flex:1;padding:13px;background:#222;border:1px solid rgba(255,255,255,.15);color:#fff;border-radius:12px;outline:none}
+.comment-input-box button{padding:13px 18px;background:#fe2c55;color:#fff;border:0;border-radius:12px;font-weight:bold;cursor:pointer}
 </style>
 </head>
 <body><div class="app">
 <div class="feed" id="feed"><div class="empty">Loading videos…</div></div>
-<div class="profile" id="profile"><div class="pagehead"><button class="back" onclick="closePage('profile')">←</button><h2>Profile</h2></div><div class="profile-card"><div class="bigavatar">👤</div><h2 style="margin-top:12px">@iqbal_official</h2><p class="muted" style="margin-top:7px">Video Creator</p><div class="stats"><div class="stat"><b id="myVideos">0</b><span class="muted">Videos</span></div><div class="stat"><b>0</b><span class="muted">Followers</span></div><div class="stat"><b>0</b><span class="muted">Following</span></div></div></div><hr><div class="empty">Your published videos will appear here.</div></div>
+<div class="profile" id="profile"><div class="pagehead"><button class="back" onclick="closePage('profile')">←</button><h2>Profile</h2></div><div class="profile-card"><div class="bigavatar">👤</div><h2 style="margin-top:12px">@iqbal_official</h2><p class="muted" style="margin-top:7px">Video Creator</p><div class="stats"><div class="stat"><b id="myVideos">0</b><span class="muted">Videos</span></div><div class="stat"><b>0</b><span class="muted">Followers</span></div><div class="stat"><b>0</b><span class="muted">Following</span></div></div></div><hr style="border:0;border-top:1px solid rgba(255,255,255,.1);margin:20px 0"><div class="empty">Your published videos will appear here.</div></div>
 <div class="search" id="searchPage"><div class="pagehead"><button class="back" onclick="closePage('searchPage')">←</button><h2>Search</h2></div><input id="searchInput" class="searchbox" placeholder="Search creators or captions…"><div id="searchResults" class="result"></div></div>
 <div class="inbox" id="inboxPage"><div class="pagehead"><button class="back" onclick="closePage('inboxPage')">←</button><h2>Inbox</h2></div><div class="empty">❤️ Likes, comments and notifications will appear here.</div></div>
 <div class="bottom"><button class="nav" onclick="home()"><b>⌂</b>Home</button><button class="nav" onclick="openPage('searchPage')"><b>⌕</b>Search</button><button class="add-upload-btn" onclick="openUpload()"><span>＋</span> Upload</button><button class="nav" onclick="openPage('inboxPage')"><b>♡</b>Inbox</button><button class="nav" onclick="openPage('profile')"><b>◉</b>Profile</button></div>
 
 <div class="modal" id="modal"><div class="sheet"><button class="close" onclick="closeUpload()">×</button><h2>Create Video / Photo</h2><p class="muted" style="margin-top:6px">Choose direct camera capture or gallery selection.</p><div class="pick"><label onclick="triggerCamera()">📷 Camera</label><label onclick="triggerGallery()">🖼️ Gallery</label></div><input id="cameraFile" type="file" accept="video/*,image/*" capture="camera" hidden><input id="galleryFile" type="file" accept="video/*,image/*" hidden><div class="form" id="form"><div id="previewContainer"></div><input id="username" maxlength="40" placeholder="@username"><textarea id="caption" maxlength="180" rows="3" placeholder="Write a caption…"></textarea><button class="publish" id="publishBtn" onclick="publishMedia()">Publish Now</button><div class="progress" id="progress"><div id="progressBar"></div></div><div class="status" id="status"></div></div></div></div>
 
-<div class="comment-modal" id="commentModal"><div class="sheet"><button class="close" onclick="closeComments()">×</button><h2>Comments</h2><div class="comment-list" id="commentList"><div class="muted">No comments yet. Be the first to comment!</div></div><div class="comment-input-box"><input id="commentInput" placeholder="Add a comment..."><button onclick="postComment()">Post</button></div></div></div>
+<div class="comment-modal" id="commentModal"><div class="sheet"><button class="close" onclick="closeComments()">×</button><h2>Comments</h2><div class="comment-list" id="commentList"><div class="muted" style="text-align:center;padding:20px">No comments yet. Be the first to comment!</div></div><div class="comment-input-box"><input id="commentInput" placeholder="Add a comment..."><button onclick="postComment()">Post</button></div></div></div>
 
 <div class="share-sheet" id="shareSheet"><div class="share-panel"><h3>Share Video</h3><div class="share-grid"><button class="share-option" onclick="nativeShare()"><b>📤</b>Share</button><button class="share-option" onclick="copyShareLink()"><b>🔗</b>Copy Link</button><button class="share-option" onclick="shareWhatsApp()"><b>💬</b>WhatsApp</button></div><button class="share-cancel" onclick="closeShare()">Cancel</button></div></div><div class="toast" id="toast"></div>
 </div>
@@ -95,7 +136,6 @@ function setupCard(card, type){
         };
     }
 
-    // Pure Double Tap to Like on Video Screen, Single tap to Play/Pause smoothly
     let lastTapTime = 0;
     card.onclick = (e) => {
         if(e.target.closest('.actions') || e.target.closest('.top') || e.target.closest('.info') || e.target.closest('.bottom')) return;
@@ -104,7 +144,6 @@ function setupCard(card, type){
         const tapInterval = currentTime - lastTapTime;
 
         if (tapInterval < 300 && tapInterval > 0) {
-            // Double Tap -> Like + Heart Animation
             if(like && !like.classList.contains('liked')) {
                 like.classList.add('liked');
                 like.firstChild.textContent = '♥';
@@ -113,7 +152,6 @@ function setupCard(card, type){
             setTimeout(() => { heart.classList.remove('show'); }, 600);
             lastTapTime = 0;
         } else {
-            // Single Tap -> Play / Pause Video
             lastTapTime = currentTime;
             setTimeout(() => {
                 if (lastTapTime === currentTime && video) {
@@ -202,7 +240,7 @@ function closeUpload(){
 function handleFile(e){
     const f = e.target.files[0];
     if(!f) return;
-    if(f.size > 100 * 1024 * 1024) return showToast('File must be 100 MB or smaller.');
+    if(f.size > 500 * 1024 * 1024) return showToast('File must be 500 MB or smaller.');
     selectedFile = f;
     const previewContainer = document.getElementById('previewContainer');
     if(f.type.startsWith('image/')) {
