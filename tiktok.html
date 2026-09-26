@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iqbal Tok - Short Video Platform</title>
 
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
@@ -34,18 +33,6 @@
         .action-btn { background: rgba(0,0,0,0.3); width: 46px; height: 46px; border-radius: 50%; display: flex; flex-direction: column; justify-content: center; align-items: center; cursor: pointer; font-size: 11px; gap: 2px; border: none; color: #fff; }
         .action-btn svg { width: 26px; height: 26px; fill: #fff; }
 
-        /* Camera Screen */
-        #camera-screen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #000; z-index: 100; display: none; flex-direction: column; justify-content: space-between; align-items: center; }
-        #camera-preview { position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 1; }
-        
-        .camera-top { position: absolute; top: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 20px; z-index: 10; }
-        .cam-btn-top { background: rgba(0,0,0,0.6); color: #fff; padding: 10px 18px; border-radius: 20px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; }
-
-        .camera-controls { position: absolute; bottom: 40px; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 10; }
-        .shoot-btn { width: 76px; height: 76px; border-radius: 50%; background: transparent; border: 4px solid #fff; display: flex; justify-content: center; align-items: center; cursor: pointer; }
-        .shoot-inner { width: 60px; height: 60px; border-radius: 50%; background: #ff3b5c; transition: all 0.2s; }
-        .shoot-btn.recording .shoot-inner { border-radius: 8px; width: 36px; height: 36px; }
-
         /* Bottom Navigation Bar */
         .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; height: 55px; background: rgba(0,0,0,0.95); display: flex; justify-content: space-around; align-items: center; z-index: 50; border-top: 1px solid #222; }
         .nav-item { color: #777; font-size: 10px; display: flex; flex-direction: column; align-items: center; cursor: pointer; }
@@ -61,26 +48,10 @@
         <span class="active">For You</span>
     </div>
 
-    <!-- Video Feed -->
     <div id="feed-container">
-        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading global feed...</div>
+        <div style="display: flex; justify-content: center; align-items: center; height: 100vh; color: #888;">Loading feed...</div>
     </div>
 
-    <!-- Camera Screen -->
-    <div id="camera-screen">
-        <div class="camera-top">
-            <button class="cam-btn-top" onclick="closeCamera()">✕ Cancel</button>
-            <button class="cam-btn-top" onclick="switchCamera()">🔄 Flip</button>
-        </div>
-        <video id="camera-preview" autoplay playsinline muted></video>
-        <div class="camera-controls">
-            <div class="shoot-btn" id="shootBtn" onclick="toggleRecording()">
-                <div class="shoot-inner"></div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bottom Navigation -->
     <div class="bottom-nav">
         <div class="nav-item active">
             <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -90,7 +61,7 @@
             <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
             Discover
         </div>
-        <div class="add-post-btn" onclick="openUploadOptions()">+</div>
+        <div class="add-post-btn" onclick="document.getElementById('directVideoInput').click()">+</div>
         <div class="nav-item">
             <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
             Inbox
@@ -101,8 +72,7 @@
         </div>
     </div>
 
-    <!-- Hidden file input for public video upload -->
-    <input type="file" id="publicVideoInput" accept="video/*" style="display: none;" onchange="handlePublicUpload(event)">
+    <input type="file" id="directVideoInput" accept="video/*" style="display: none;" onchange="uploadDirectVideo(event)">
 
     <script>
         const firebaseConfig = {
@@ -118,12 +88,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let mediaStream = null;
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let useFrontCamera = true;
-
-        // Load Global Videos from Firebase
+        // Load Global Feed
         function loadGlobalFeed() {
             db.ref('videos').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -200,103 +165,28 @@
             if(svg) svg.style.fill = '#ff3b5c';
         }
 
-        function openUploadOptions() {
-            let choice = confirm("OK = Record from Camera | Cancel = Upload from Gallery");
-            if (choice) {
-                document.getElementById('camera-screen').style.display = 'flex';
-                startStream();
-            } else {
-                document.getElementById('publicVideoInput').click();
-            }
-        }
-
-        async function startStream() {
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
-            try {
-                const constraints = {
-                    video: { facingMode: useFrontCamera ? 'user' : 'environment' },
-                    audio: true
-                };
-                mediaStream = await navigator.mediaDevices.getUserMedia(constraints);
-                document.getElementById('camera-preview').srcObject = mediaStream;
-            } catch (err) {
-                alert('Camera permission required.');
-                closeCamera();
-            }
-        }
-
-        function switchCamera() {
-            useFrontCamera = !useFrontCamera;
-            startStream();
-        }
-
-        function closeCamera() {
-            document.getElementById('camera-screen').style.display = 'none';
-            if (mediaStream) {
-                mediaStream.getTracks().forEach(track => track.stop());
-            }
-        }
-
-        function toggleRecording() {
-            const shootBtn = document.getElementById('shootBtn');
-            
-            if (!mediaRecorder || mediaRecorder.state === "inactive") {
-                recordedChunks = [];
-                try {
-                    mediaRecorder = new MediaRecorder(mediaStream, { mimeType: 'video/webm' });
-                } catch (e) {
-                    mediaRecorder = new MediaRecorder(mediaStream);
-                }
-
-                mediaRecorder.ondataavailable = (e) => {
-                    if (e.data.size > 0) recordedChunks.push(e.data);
-                };
-
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                    const reader = new FileReader();
-                    reader.readAsDataURL(blob);
-                    reader.onloadend = function() {
-                        pushToFirebase(reader.result, "My recorded video #iqbaltok");
-                    };
-                    closeCamera();
-                };
-
-                mediaRecorder.start();
-                shootBtn.classList.add('recording');
-            } else {
-                mediaRecorder.stop();
-                shootBtn.classList.remove('recording');
-            }
-        }
-
-        function handlePublicUpload(event) {
+        // Direct Video Upload from Folder
+        function uploadDirectVideo(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onloadend = function() {
-                    pushToFirebase(reader.result, "Public uploaded video #iqbaltok");
+                    const newRef = db.ref('videos').push();
+                    newRef.set({
+                        videoUrl: reader.result,
+                        username: "iqbal_creator",
+                        caption: "My uploaded video #iqbaltok",
+                        likes: Math.floor(Math.random() * 5000) + 100
+                    }, (error) => {
+                        if (error) {
+                            alert('Upload failed!');
+                        } else {
+                            alert('Video uploaded successfully!');
+                        }
+                    });
                 };
             }
-        }
-
-        function pushToFirebase(videoUrl, captionText) {
-            const newRef = db.ref('videos').push();
-            newRef.set({
-                videoUrl: videoUrl,
-                username: "public_creator",
-                caption: captionText,
-                likes: Math.floor(Math.random() * 8000) + 500
-            }, (error) => {
-                if (error) {
-                    alert('Upload failed. Try a smaller video.');
-                } else {
-                    alert('Video uploaded successfully for everyone!');
-                }
-            });
         }
 
         function setupAutoplay() {
